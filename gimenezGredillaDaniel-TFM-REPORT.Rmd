@@ -130,7 +130,7 @@ This method has been evaluated as the most appropriate, as it makes it possible 
 
 1.3.1 - Elaborate a list of dimension reduction packages and functions from chosen languages. (7 days, 21 hours equivalent)  
 
-1.3.2 - Choose a subset and elaborate a briefing of package traits: optimal application, parameters, example workflows it has actually been used for, etc. (4 days, 9 hours equivalent)  
+1.3.2 - Choose a subset and elaborate a briefing of package traits: optimal application, parameters, example workflows it has actually been used for, etc. (4 days, 12 hours equivalent)  
 
 1.3.3 - Elaborate monitoring report for **Phase 1**. (7 days, 21 hours equivalent)
 
@@ -285,9 +285,7 @@ This project's self-evaluation will confront it from two angles: first, a side-b
 **"Dimension reduction: an introduction"**: A brief presentation of the main topic in this project. What they are, what they are useful for.  
 **"PCA"**: 
 
-#2 - All other chapters  
-
-##2.1 - Dimension reduction: an introduction  
+#2 - Dimension reduction: an introduction  
 
 Actual data derived from actual studies, as opposed to ideal, condition-controled data, is mudded by the complexity of reality, and in order to approximate it, needs to be measured by large quantities of variables, giving up high dimensionality datasets, as may be the case of digital imaging, speech recognition or complex classification tasks. This high dimensionality needs to be adequately reduced in order to make studies attainable, able to be handled effectively. In fact, not all the measured variables may be "important" to the goal of a study.
 
@@ -301,13 +299,13 @@ Traditionally, dimensionality reduction techniques relied in linear transformati
 
 The techniques used for this project will be described in the next subsections. History, mathematical background and reasons for its selection will be addressed where available. Further along this document, programming applications and protocols will be addressed.  
 
-##2.2 - PCA  
+##2.1 - PCA  
 
 PCA is the most used unsupervised, linear dimension reduction technique currently available. It is also the best, in the mean-square error sense [@Fodor2002]. Its central idea is the construction of a set of features from a number of initial variables [@Jolliffe2002]. The number of new features will be less than the initial variables, while retaining as much as possible of the initial variation. This is achieved by linear transformations of the original data, and then establishing a descending order of the new features attending to the amount of variation retained or explained by each of them.  
 
 Given $X$, a vector of *p* random variables, as object of interest for any study, and given that $X$ is complex enough, the raw study of the correlation between variables may get to be inefficient and expensive in time and effort. Instead of getting the *p* variances and the $\frac{1}{2}p(p -1)$ correlations for each sample in the study, the goal is to search for less, equally (or effectively equally) explicative features.  
 
-###2.2.1 - Historical background  
+###2.1.1 - Historical background  
 
 PCA was invented in 1901 by Karl Pearson, the roots of it deeply burrowed in regression-thinking. In its first approach, which independently builds up on singular value decomposition, Pearson is concerned with finding lines and planes that best fit a set of points in a $p$-dimensional space through geometric optimization [@Jolliffe2002].  
 
@@ -319,7 +317,7 @@ From then on further applications and extensions of PCA have been made by resear
 
 Even though it seems to be a simple technique and much has been discussed about it, it has been applied to an extensive range of fields and is still in research.  
 
-###2.2.2 - Mathematical background  
+###2.1.2 - Mathematical background  
 
 Let us suppose data is collected in a matrix $X$ with $I$ rows $(i = 1,...,I)$. These $I$ rows will usually be the observations or samples for the study. $X$ is also composed of $J$ columns $(j = 1,...,J)$, being these the measured variables. Each of these variables are denoted $x_j (j=1,...,J)$, and thus the matrix is of $I x J$ dimensions.  
 
@@ -343,13 +341,13 @@ $\underset{||w|| = 1}{\operatorname{argmax}} (t^Tt) = \underset{||w|| = 1}{\oper
 
 Which can be solved as an eigenvector problem, being the first eigenvector the first Principal Component, the second eigenvector the second Principal Component, and so on.  
 
-###2.2.3 - Reasons for selection  
+###2.1.3 - Reasons for selection  
 
 PCA is an ubiquitous technique that is described and analyzed, in any of its many interpretations, almost in every book about feature analysis [@Tipping1999]. It's a widely used linear dimension reduction technique that has proven itself of the utmost power time and time again. As such, including it in this comparison is useful not only for the comparison of the technique itself, but as a kind of benchmark: to asses any dimension reduction technique that, applied to the subject of this study (feature construction for lymphocyte classification), is able to hold a candle to PCA.  
 
 Also, as has been stated, PCA has been focused on from many angles, and it is expected to have been widely tackled by bioinformatics languages and tools. A suitable bioinformatics integration of this technique is expected to be found, or several, that fit this study for comparison; in an ideal context, it should be accessible, Open Source and the methods and results of this study should be easily reproducible by anyone reviewing it.
 
-##2.3 - ICA  
+##2.2 - ICA  
 
 Independent Component Analysis (*ICA*) is a statistical method for transforming an observed multidimensional random vector into components that are statisticaly as independent from each other as possible, this is, a tendency to **redundancy reduction** [@Tobergte2013]. In its linear approach, as with other dimension reduction algorithms, its goal is to take a zero-mean, *m*-dimensional variable, and by means of a linear transformation, find its *n*-dimensional transform, such that $n \le m$, this transformation having some suitable properties. The vectors obtained from this transformation are neither orthogonal nor ranked in order.  
 
@@ -357,7 +355,7 @@ Feature extraction is a prominent application of *ICA*. It is originally motivat
 
 *ICA* is a generative model (it describes how the observed data are generated by describing the components), and it seeks the minimization of mutual information between the transformed variables. It depends on the supposition of nongaussianity for the data; gaussian data is independent and of mean zero, it has no skewness and as such can only be estimated up to an orthogonal transformation [@Hyvarinen2000].  
 
-###2.3.1 - Historical background  
+###2.2.1 - Historical background  
 
 *ICA* is relatively modern compared to other dimension reduction techniques. It's originally introduced by Jeanny Hérault and Bernard Ans in 1984, by approach if not by name. This original application concerned neurological signals and muscle movement, and proposed a specific feedback circuit to explain how the nervous system was able to infer the position and velocity of these signals by measuring their responses [@Hyvarinen2001].  
 
@@ -367,7 +365,7 @@ By this time, A. J. Bell and T. J. Sejnowski publish their infomax approach to *
 
 *ICA* is currently used in fields such as optical imaging, face recognition and prediction of apparently stochastic phenomena.  
 
-###2.3.2 - Mathematical background    
+###2.2.2 - Mathematical background    
 
 Using vector-matrix notation, let us denote by **x** the random vector whose elements are the mixtures $x_1,...,x_n$, and by **s** the random vector with elements $s_1,...,s_n$, being this the independent component; **A** is the mixing matrix with elements $a_{ij}$ [@Hyvarinen2000]. Using this notation, the model for this data is $x = As$. Working with the columns of matrix **A**, and denoting them by $a_j$, the model can also be written as  
 
@@ -391,7 +389,7 @@ $J(y) = H(y_{gauss} - H(y))$
 
 Where $H(y_{gauss})$ is the entropy value of a gaussian variable of the same covariance as $y$. This way, negentropy is always nonnegative and $J(y)$ is only zero if the entropy of $y$ is the same as that of its equivalent gaussian variable, this is, its gaussian itself.  
 
-###2.3.3 - Selection  
+###2.2.3 - Selection  
 
 Other studies have already been centered around the comparison of *PCA* and *ICA* on different fields, such as [@TibaduizaBurgos2013] or [@Pet2010]. *ICA* is a widely-used, exhaustively applied to bioinformatics linear dimension reduction technique that rivals *PCA* in terms of use. Algorithms for this technique have been developed in popular bioinformatics programming languages, in Open Source environments, that are available for researchers to use.
 
@@ -399,13 +397,13 @@ Other studies have already been centered around the comparison of *PCA* and *ICA
 
 For this reasons (wide use, availability in Open Source environments, different approach to principal components), *ICA* has been selected for this comparison study.  
 
-##2.4 - Factor Analysis  
+##2.3 - Factor Analysis  
 
 The basic idea underlying Factor Analysis is that *p* observed random variables, **x**, can be expressed, except for an error term, as linear functions of $m(<p)$ hypothetical (random) variables or *common factors* [@Jolliffe2002]. The aim of Factor Analysis is to group variables that share a "common theme" under the same grouping, such that the dimensionality of the dataset is decreased.  
 
 Factor Analysis has been applied in psychology to identify groups of inter-related variables, as those components of intelligence that can be placed under a single factor *g* or *general intelligence*, grouping factors such as *broad visual perception* (it includes all the intelligence variables related to visual tasks), or *broad auditory percention* (same as before, but with auditory tasks). This is interpreted as someone with a high *g* having good *broad auditory and visual perceptions*, and *g* sinthetically explaining the behaviour of the factors and variables "contained" within itself.
 
-###2.4.1 - Historical background  
+###2.3.1 - Historical background  
 
 The origin of factor analysis, initially applied to the field of psychology, is usually ascribed to Charles Spearman back in 1904. He worked to develop a psychological theory involving a single general factor and a number of specific factors. In this phase of development, "factors" were still not mentioned explicitly. In the next twenty years a lot of work would go into following advancements in this theory, with researchers such as Cyril Burt, Karl Pearson, Godfrey H. Thompson, J. C. Maxwell Garnett and Karl Holzinger. Special mention goes to Karl Pearson, who devoted the remaining forty years of his life to the study of *Factor Analysis* [@HarryHHarman1976].  
 
@@ -415,7 +413,7 @@ In the 50s and 60s factor analysis entered the age of large-scale computing. It 
 
 The major advancements, in a statistical, mathematical and computational sense, were made by Karl Jöreskog, in the University of Uppsala, in Sweden. He developed a maximum-likelihood estimation algorithm that has, since then, been applied in most commercial computer programs ever since. He himself, and Bock and Bargman (1966) pre-sprecify various parameters about the common factor analysis model relating manifest variables to latent variables according to a structural theory. This model is then used to generate a covariance matrix that is testes for goodness of fit to an empirically-tested covariance matrix. This has had the effect of guiding later researchers to a protocol of action where variables are assessed before blind application of factor analysis to a dataset [@StanleyAMulaik2009].  
 
-###2.4.2 - Mathematical background  
+###2.3.2 - Mathematical background  
 
 Factor analysis is a method for investigating whether a number of variables of interest $Y_1, Y_2,..., Y_l$, are linearly related to a smaller number of unob- servable factors $F_1, F_2,..., F_k$.  
 
@@ -444,13 +442,13 @@ Splitting this variance definition in two parts, $\beta_{i1}^2 + \beta_{i2}^2$ i
 
 The loadings are not unique. There exist an infinite number of sets of values of $\beta_{ij}$ that yield the same variances and covariances.
 
-###2.4.3 - Selection  
+###2.3.3 - Selection  
 
 Factor Analysis is inexpensive and simple to use. It has been extensively integrated in many programming languages, some of the most powerful, Open Source and community-supported, like **R**. It's a great support tool when used in conjunction with other dimension reduction methods, and it can yield not only the aforementioned dimension reduction, but also an insight on the relation between the original variables and structure that may be add a further value to this method.  
 
 For all these reasons, Factor Analysis has been selected as one of the techniques to assess in this project.  
 
-##2.5 - Autoencoders  
+##2.4 - Autoencoders  
 
 Even though there are many types of autoencoders and all will be at the least mentioned in this section, **denoising autoencoders** will be the main subject of this project in this area, and they will be explained in more depth.  
 
@@ -470,11 +468,11 @@ Other corruption processes are possible.
 
 Autoencoders' extracted features can be used in other classification algorithms, as will be done in this project.  
 
-###2.5.1 - Historical background  
+###2.4.1 - Historical background  
 
 Not much autoencoder historical background is addressed in current literature. [@Chen2017] states that, as autoencoders have evolved gradually and much of the terminology has changed and evolved with it, it's difficult to put a finger on the origin of all ideas used in them. Even so, [@Ballard1987] first proposes them in 1987 as an unsupervised pre-training method for **Artificial Neural Networks** (*ANNs*).
 
-###2.5.2 - Mathematical background  
+###2.4.2 - Mathematical background  
 
 Let $P(X)$ be the data-generating distribution over observed random variable $X$ [@Bengio2013]. Let $C$ be a given corruption process that stochastically maps an $X$ to a $\tilde{X}$ through conditional distribution $C(\tilde{X}|X)$. The training data for the generalized denoising auto-encoder is a set of pairs $(X, \tilde{X})$ with $X \sim P(X)$ and $\tilde{X} \sim C(\tilde{X}|X)$. The DAE is trained to predict $X$ given $\tilde{X}$ through a learned conditional distribution $P_\theta(X \mid \tilde{X})$, by choosing this conditional distribution within some family of distributions indexed by $\theta$, not necessarily a neural net. The training procedure for the DAE can generally be formulated as learning to predict $X$ given $\tilde{X}$ by possibly regularized maximum likelihood, i.e., the generalization performance that this training criterion attempts to minimize is  
 
@@ -484,15 +482,107 @@ where the expectation is taken over the joint data-generating distribution
 
 $P(X, \tilde{X}) = P(X) C (\tilde{X} \mid X)$   
 
-###2.5.3 - Selection  
+###2.4.3 - Selection  
 
-Autoencoders, specifically stacked denoising autoencoders, have been stated to perform well as feature constructors in machine learning classification algorithms [@Vincent2008]. This unsupervised algorithm is a modern addition to the pool of existing feature construction techniques, backed by a copious amount of literature, and applied to several bioinformatics-focused programming languages. Thus it has been selected for this project.
+Autoencoders, specifically stacked denoising autoencoders, have been stated to perform well as feature constructors in machine learning classification algorithms [@Vincent2008]. This unsupervised algorithm is a modern addition to the pool of existing feature construction techniques, backed by a copious amount of literature, and applied to several bioinformatics-focused programming languages. Thus it has been selected for this project.  
 
-#3 - Conclussions  
+#3 - Tools  
 
-#4 - Glossary  
+Digital tools for this project are described in this section. It will cover a brief definition, some historical background where available, and a collection of packages, libraries, modules, etc. to be used for each. All code used or created is available on **Annex [X]: Code**.  
 
-#5 - Annexes  
+##3.1 - Criteria  
 
-#6 - References  
+The tools to be used in this project must fulfill some basic criteria to be considered as fit. This criteria are as follows:  
+
+- Open Source. Given the nature of research, and the specific circumstances and parameters that derive from it, any tool used in this project must be flexible to adapt and re-code, and subsequently make available to other researchers under an Open Source agreement.  
+
+- Wide application. Any language, package or toolkit used in this project must have been backed, tested and reviewed by the community as a valid tool based on sound workflows and methods. This adds reproducibility to the project and avoids "it worked in my environment" situations.
+
+- Accessibility for non-computer-science oriented users (i.e. **biologists**). A researcher aiming to use these tools must only fulfill the requirement of understanding the probabilistic implications of the methods applied, and has to be able to apply them without the risk of being confused by arcane or excessively-complex frameworks or workflows which would only add another layer of error.  
+
+As such, some programming languages have been discarded, either for not being Open Source (like **SPSS** or **MATLAB**) or for being obscure or niche-focused (like **Haskell**). The selected languages and tools are below.  
+
+##3.2 - Python  
+
+**Python** is a powerful, system accessible, interpreted scripting language [@Chun2006]. Data types like lists (resizable arrays) and dictionaries (hash tables) are built-in, providing a dynamic typing instead of having to declare types of variables, as is the case in **C++**. This reduces the framework development time.  
+
+**Python** is an *OOJ* (*Object-Oriented Programming*), high-level, general-purpose language. It is initially developed with a focus on being easy to read and write [@Granger2011], while also granting access to low-level proccesses, offering simple portability and well-defined exception catching and handling. Even so, it doesn't force this work model on the user, and can be actuated upon in a procedural way if needed. 
+
+In **Python** programs are organized as packages (packs of modules), modules (related code grouped together), classes, methods and functions. It offers a creative, Open Source environment suited to the development of new, more focused tools and objects, such as **NumPy** or **Scikit-learn**, both libraries specially developed for the scientific treatment of data, each with its own goal.  
+
+**Python** can be used as a scripting language; it's able to use modular components written in other languages. An example would be coding a program in **C++** and importing it as a module in **Python**, then creating a GUI for it [@Nosrati2011]. It supports other technologies, such as **.Net** objects, even going as far as specific modules having been created to interface with them.  
+
+Last, but not less important, Python relies on a wide support by its community. Everyday modules and packages are improved, developed and distributed in a collaborative environment, making it accessible to everyone, and giving researchers a fast, powerful tool for their goals. Literature and documentation is vastly available in digital and physical formats.
+
+###3.2.1 - History  
+
+**Python** is created in the late 1989/early 1990 by Guido Van Rossum at the *CWI* (Centrum voor Wiskunde en Informatica, the National Research Institute for Mathematics and Computer Science) [@Chun2006]. It's developed as a research tool substituting another language called *ABC*, as Van Rossum felt it lacked scalability with his own needs and didn't want to fall back to using languages like **C++** or **LISP**.  
+
+Python is released for public distribution in 1991. Several releases of version 1 are published by *CWI*, until Guido Van Rossum moves to Reston, Virginia, to the *CNRI* (*Corporation for National Research Initiatives*), where here releases versions of **Python** up until 1.6.  
+
+Changing to commercial software development in 2000, Guido Van Rossum felt that the ability to work under the **GNU Public License** was desirable. Both versions 1.6.1, with the collaboration if the *CNRI* and the *FSF* (*Free Software Foundation*), and **Python 2.0** conform to this license. Python 2.0 is released under *BeOpen.com* as a derivative work from **Python 1.6**.  
+
+Guido Van Rossum and the other PythonLabs developers have since then joined *Digital Creations*. All their work from then on is owned by the *PSF* (*Python Software Foundation*), a non-profit foundation modeles after the *Apache Software Foundation*.  
+
+###3.2.2 - Packages and libraries  
+
+The following **Python** modules and functions are used in this project. Every module is provided with citation where available.  
+
+**Scikit-learn** [@Pedregosa2012]: **Scikit-learn** is a "toolbox" of implementations of many popular machine learning algorithms. It has been developed with researchers from fields outside of computer sciences to use, thus its simplicity of application for many machine learning problems. It is distributed under a *BSD* license, and it only has **NumPy** and **SciPy** as dependencies. It has even been distributed as part of main OS distributions such as Ubuntu or Debian.
+
+- PCA: *sklearn.decomposition.PCA()*.  
+This implementation of **Principal Component Analysis** uses **SVD** to project the data to a lower dimensional level, using either a LAPACK implementation of the full **SVD**, the method of [@Halko2009], or the **SciPy** module's own ARPACK implementation of the truncated **SVD**.
+
+- ICA: *sklearn.decomposition.FastICA()*.  
+This function applies the FastICA method to the data, accepting parameters like number of components to use, iterations to fit or a stated mixing matrix.
+
+- Factor Analysis: *sklearn.decomposition.FactorAnalysis()*  
+This function performs a maximum-likelihood estimate of the loading matrix (what loading is has been assessed in section 2.3.2).  
+
+**Keras** [@chollet2015]: Keras is a high-level neural networks API developed for Python and developed for direct and simple application. In the author's own words, *"being able to go from idea to result with the least possible delay"*.  
+
+**NumPy and SciPy**: these two modules act as dependencies for **Scikit-learn**. **NumPy** [@Walt2011] arrays are the standard object for data representation in **Python**. These arrays can have any number of dimensions and can contain other kinds of elements. **ScyPy** [@Scipy2001], is a collection of algorithms and  functions built on **Numpy**. It adds high-level commands and classes for manipulating and visualizing data.
+
+##3.3 - R  
+
+**R** [@R2008] is a quite modern statistics-focused programming language. It is an implementation of the **S** language with lexical scoping semantics inspired by **Scheme**. **S** was developed at Bell Laboratories by John Chambers and coleagues, while **R** was developed by Ross Ihaka and Robert Gentleman at the University of Auckland, New Zealand.  
+
+The project started its development in 1992, with a first release in 1995 and a stable beta in 2000. The base package of the program provides with native functions for many common-use mathematical workflows, and it is easily expanded via libraries and packages delivered in an Open Source environment through the CRAN site cluster.  
+
+R's main advantages are:  
+
+- Effective data handling and storage capabilities.  
+- Many generic and specific object families, flexible enough to cover most uses.  
+- Powerful graphical tools, either for direct display or hard copy, with output of publication-level quality.  
+- User-defined function creation for adaptation of R's capabilities to each individual requirements.  
+- Community-supported development environment.  
+
+R is distributed as Free Software under the terms of the Free Software Foundation’s GNU General Public License in source code form. It is multiplatform, running seamlessly in MacOS, Windows and a wide variety of UNIX platforms, even being distributed natively with some of them. It is documented via its own LaTeX documentation format.
+
+###3.3.1 - Packages and libraries  
+
+The following **R** packages and libraries are used in this project. Every library is provided with citation where available.  
+
+**Base package**:  
+The base package for **R** implements many generalistic functions for data handling, information structure, basic mathematical functions and more.  
+
+**Base package::prcomp()** (https://stat.ethz.ch/R-manual/R-devel/library/stats/html/prcomp.html):  
+*Prcomp()* is R's native implementation of **Principal Component Analysis**. It is parameterized with the options to scale and center data before the analysis, rank (the maximum number of principal components to be used) or the magnitude of the standard deviation below which components should be omitted.
+
+**ICA package::icafast()** [@Helwig2015]:  
+This package assesses the implementation of several **ICA** algorithms, including **FastICA**, **Infomax** and **JADE**. **FastICA** [@Hyvarinen2000] will be used for this project, accepting parameters like the number of components to extract, options to center data before ICA decomposition or convergence tolerance. 
+
+**Stats package::factanal()** (https://stat.ethz.ch/R-manual/R-devel/library/stats/html/factanal.html):  
+This function performs maximum-likelihood factor analysis on a covariance matrix or a data matrix. As parameters it accepts the number of factors to be fitted, the type of scores to be output (*Thompson's*, *Bartlett's*, etc), or the number of observations if the input given to the function is a covariance matrix.
+
+**RcppDL package::RsdA()** [@RcppDL2015]:  
+The **RcppDL** package includes a kit of basic, multilayer machine learning algorithms, **Restricted Boltzmann Machines** and **Deep Belief Networks** amongst them. The *rsda()* function is a wrapper to initialise a *deeplearning* object implementing stacked denoising autoencoding on a set of data. It can be then pretrained, fine tuned and used for prediction or classification.  
+
+#4 - Conclussions  
+
+#5 - Glossary  
+
+#6 - Annexes  
+
+#7 - References  
 
