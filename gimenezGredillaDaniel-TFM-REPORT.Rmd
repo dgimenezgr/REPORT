@@ -486,6 +486,40 @@ $P(X, \tilde{X}) = P(X) C (\tilde{X} \mid X)$
 
 Autoencoders, specifically stacked denoising autoencoders, have been stated to perform well as feature constructors in machine learning classification algorithms [@Vincent2008]. This unsupervised algorithm is a modern addition to the pool of existing feature construction techniques, backed by a copious amount of literature, and applied to several bioinformatics-focused programming languages. Thus it has been selected for this project.  
 
+##2.5 - T-distributed Stochastic Neighbor Embedding  
+
+**T-distributed Stochastic Neighbor Embedding** is a nonlinear algorithm for dimension reduction. It was developed in 2008 by Laurens Van der Maaten and Geoffrey Hinton [@Maaten2008]. It's a variation of **Stochastic Neighbor Embedding** and improves it by allowing a better visualization of high-dimensional data lying in several, lower-dimension, related manifolds. This technique is allegedly able to capture much of the local structure of the original, high-dimensional data , while also revealing global structure such as the presence of clusters at several scales.  
+
+**SNE** is a probabilistic approach to the visualization of the structure of complex data sets, preserving neighbor similiarities [@Bunte2012]. It was proposed by Hinton and Roweis [@Hinton2002]. **SNE** converts high dimensional Euclidean distances between data points into probabilities that represent similarities. The similarity of one point to another is the probability that the first would choose the second as its neigbor. For points that are near one another, this probability *p* will be high. Due to the characteristics of the cost function, for widely separated points *p* will be almost infinitesimal.  
+
+The **T-distributed Stochastic Neighbor Embedding** differs from the basic **SNE** in its cost function. **SNE**'s cost function is difficult to optimize due what has been called the *crowding problem* (the artifact through which even the small attractive forces between the moderately distant points around the center of the low-dimensional map effect the natural distances between clusters, decreasing them drastically), and applies a **Gaussian** distribution to compute similarity between two points in the lower-dimension space. The **t-SNE** algorithm uses instead a heavy-tailed **Student-T** distribution. This alleviates the *crowding problem*.  
+
+###2.5.2 - Mathematical background  
+
+Assume we have a data set of high-dimensional objects $D = \{x_1, x_2,...,x_N\}$ and a function $d(x_i,x_j)$ to compute an Euclidean distance between two objects [@VanderMaaten2014]. The aim of the **t-Distributed Stochastic Neighbor Embedding** is to learn an n-dimensional embedding in which each object is represented by a point $\xi = \{y_1, y_2, ..., y_N\}$ with $y_i \in \mathbb{R}^S$ (typical values for *S* are 2 or 3). Let *P* be the joint probability $p_{ij}$ that measures the similarity between $x_i$ and $x_j$ by symmetrizing two probabilities:  
+
+$p_{i|j} = \frac{exp(-d(x_i,X_j)^2/2\sigma_i^2)}{\sum_{k \neq i}exp(-d(x_i,X_k)^2/2\sigma_i^2)}$,  
+
+$p_{i|i} = 0$,  
+
+$p_{ij} = \frac{p_{j|i} + p_{i|j}}{2N}$  
+
+In the low-dimensional $\xi$, the similarity $Q$ between $y_i$ and $y_j$ are measured using the already mentioned heavy-tailed, normalized **Student-T** distribution with a single degree of freedom.  
+
+$q_{i|j} = \frac{(1 + ||y_i - y_j||^2)^{-1}}{\sum_{k \neq l}(1 + ||y_k - y_l||^2)^{-1}}$,  
+
+$q_{ii} = 0$  
+
+The locations of the $y$ points in $\xi$ are determined by minimizing the Kullback-Leibler distance between *P* and *Q*.  
+
+$KL(P||Q) = \sum_{i \neq j} p_{ij} log \frac{p_{ij}}{q_{ij}}$
+
+**T-SNE** scales exponentially to the number of observations, so the processing power required to apply it scales non-efficiently beyond a few thousands of observations.  
+
+###2.5.3 - Selection  
+
+The **T-SNE** algorithm is a useful dimension reduction technique that allegedly gives a better visualization of complex data sets and solves the original problem of the technique, namely the *crowding problem*. It has been applied in the fields of computer security, cancer research, image recognitiona and bioinformatics, and given the current state of its application in bioinformatics programming languages and frameworks, it is deemed to be a qualitative addition to this study.  
+
 #3 - Tools  
 
 Digital tools for this project are described in this section. It will cover a brief definition, some historical background where available, and a collection of packages, libraries, modules, etc. to be used for each. All code used or created is available on **Annex [X]: Code**.  
@@ -539,7 +573,11 @@ This function applies the FastICA method to the data, accepting parameters like 
 - Factor Analysis: *sklearn.decomposition.FactorAnalysis()*  
 This function performs a maximum-likelihood estimate of the loading matrix (what loading is has been assessed in section 2.3.2).  
 
-**Keras** [@chollet2015]: Keras is a high-level neural networks API developed for Python and developed for direct and simple application. In the author's own words, *"being able to go from idea to result with the least possible delay"*.  
+- Stacked Denoising Autoencoders: *Keras* [@chollet2015]:
+Keras is a high-level neural networks API developed for Python and developed for direct and simple application. In the author's own words, *"being able to go from idea to result with the least possible delay"*.  
+
+- T-Distributed Stochastic Neighbor Embedding: *sklearn.manifold.TSNE()*.
+Even though this implementations documentation states the need for a previous dimension reduction technique for fully significant results, for the sake of comparison equality it will be used on the data set as is, with all the original variables.  
 
 **NumPy and SciPy**: these two modules act as dependencies for **Scikit-learn**. **NumPy** [@Walt2011] arrays are the standard object for data representation in **Python**. These arrays can have any number of dimensions and can contain other kinds of elements. **ScyPy** [@Scipy2001], is a collection of algorithms and  functions built on **Numpy**. It adds high-level commands and classes for manipulating and visualizing data.
 
@@ -577,6 +615,9 @@ This function performs maximum-likelihood factor analysis on a covariance matrix
 
 **RcppDL package::RsdA()** [@RcppDL2015]:  
 The **RcppDL** package includes a kit of basic, multilayer machine learning algorithms, **Restricted Boltzmann Machines** and **Deep Belief Networks** amongst them. The *rsda()* function is a wrapper to initialise a *deeplearning* object implementing stacked denoising autoencoding on a set of data. It can be then pretrained, fine tuned and used for prediction or classification.  
+
+**Tsne package::tsne()** [@Tsne2016]:
+The **Tsne** package contains only one function, namely *tsne()*, an implementation of the **T-distributed Stochastic Neighbor Embedding** for R. It provides an interface for the application of **t-SNE** on **R** matrices or *dist* objects.
 
 #4 - Conclussions  
 
