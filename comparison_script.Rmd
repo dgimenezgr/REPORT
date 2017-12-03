@@ -1,0 +1,51 @@
+---
+title: "Comparison Script"
+author: "Giménez Gredilla, Daniel"
+date: "October 2017"
+bibliography: library.bib
+output:
+  pdf_document: 
+    toc: yes
+    toc_depth: 3
+    fig_caption: yes
+    includes:  
+      in_header: tex-support.tex
+options:
+  encoding: utf8
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.lp = "Fig. ", tidy.opts=list(width.cutoff=60),tidy=TRUE, cache = TRUE, fig.width=12, fig.height=4, comment = NULL, out.height='200px', dpi=200, fig.pos = 'h', out.extra = '')
+```
+
+```{r library_load}
+require(stats)
+require(caret)
+require(e1071)
+```
+
+
+```{r data_var_declare, include=FALSE, echo=FALSE}
+data_class_factors <- 7
+data_class_numeric <- 2867
+data_response_index <- 2
+```
+
+```{r data_load}
+colClasses <- append(c(rep("factor",data_class_factors)),c(rep("numeric",data_class_numeric)))
+#data_df <- read.csv2(file = "data/data_1000L.csv", sep = ",", dec = ".", colClasses = colClasses, stringsAsFactors = FALSE)
+data_df <- read.csv2(file = "data/data.csv", sep = ",", dec = ".", colClasses = colClasses, stringsAsFactors = FALSE)
+data_formula <- as.formula(paste(colnames(data_df[data_response_index]), "~", paste(colnames(data_df)[-(1:data_class_factors)], collapse=" + ")))
+data_predictors <- data_df[,8:2874]
+data_responses <- data_df[,data_response_index]
+```
+
+```{r data_pca}
+data_pca <- prcomp(data_predictors, center = TRUE, scale = TRUE)
+data_pca_svm <- svm(data_pca$x[,1:500], y = data_responses, type = "C-classification", kernel = "radial")
+data_pca_predict <- predict(data_pca_svm, data_pca$x[, 1:500])
+data_pca_table <- table(data_pca_predict, data_responses)
+data_pca_perc_table <- prop.table(table(data_pca_predict, data_responses))*100
+sum(diag(data_pca_perc_table))
+```
+

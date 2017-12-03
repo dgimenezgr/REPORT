@@ -600,7 +600,7 @@ As such, some programming languages have been discarded, either for not being Op
 
 **Python** is a powerful, system accessible, interpreted scripting language [@Chun2006]. Data types like lists (resizable arrays) and dictionaries (hash tables) are built-in, providing a dynamic typing instead of having to declare types of variables, as is the case in **C++**. This reduces the framework development time.  
 
-**Python** is an *OOJ* (*Object-Oriented Programming*), high-level, general-purpose language. It is initially developed with a focus on being easy to read and write [@Granger2011], while also granting access to low-level proccesses, offering simple portability and well-defined exception catching and handling. Even so, it doesn't force this work model on the user, and can be actuated upon in a procedural way if needed. 
+**Python** is an *OOJ* (*Object-Oriented Programming*), high-level, general-purpose language. It is initially developed with a focus on being easy to read and write [@Granger2011], while also granting access to low-level proccesses, offering simple portability and well-defined exception catching and handling. Even so, it doesn't force this work model on the user, and can be actuated upon in a procedural way if needed.  
 
 In **Python** programs are organized as packages (packs of modules), modules (related code grouped together), classes, methods and functions. It offers a creative, Open Source environment suited to the development of new, more focused tools and objects, such as **NumPy** or **Scikit-learn**, both libraries specially developed for the scientific treatment of data, each with its own goal.  
 
@@ -639,7 +639,7 @@ Keras is a high-level neural networks API developed for Python and developed for
 - T-Distributed Stochastic Neighbor Embedding: *sklearn.manifold.TSNE()*.
 Even though this implementations documentation states the need for a previous dimension reduction technique for fully significant results, for the sake of comparison equality it will be used on the data set as is, with all the original variables.  
 
-**NumPy and SciPy**: these two modules act as dependencies for **Scikit-learn**. **NumPy** [@Walt2011] arrays are the standard object for data representation in **Python**. These arrays can have any number of dimensions and can contain other kinds of elements. **ScyPy** [@Scipy2001], is a collection of algorithms and  functions built on **Numpy**. It adds high-level commands and classes for manipulating and visualizing data.
+**NumPy and SciPy**: these two modules act as dependencies for **Scikit-learn**. **NumPy** [@Walt2011] arrays are the standard object for data representation in **Python**. These arrays can have any number of dimensions and can contain other kinds of elements. **ScyPy** [@Scipy2001], is a collection of algorithms and  functions built on **Numpy**. It adds high-level commands and classes for manipulating and visualizing data.  
 
 ##3.3 - R  
 
@@ -665,7 +665,7 @@ The following **R** packages and libraries are used in this project. Every libra
 The base package for **R** implements many generalistic functions for data handling, information structure, basic mathematical functions and more.  
 
 **Base package::prcomp()** (https://stat.ethz.ch/R-manual/R-devel/library/stats/html/prcomp.html):  
-*Prcomp()* is R's native implementation of **Principal Component Analysis**. It is parameterized with the options to scale and center data before the analysis, rank (the maximum number of principal components to be used) or the magnitude of the standard deviation below which components should be omitted.
+*Prcomp()* is R's native implementation of **Principal Component Analysis**. It is parameterized with the options to scale and center data before the analysis, rank (the maximum number of principal components to be used) or the magnitude of the standard deviation below which components should be omitted.  
 
 **ICA package::icafast()** [@Helwig2015]:  
 This package assesses the implementation of several **ICA** algorithms, including **FastICA**, **Infomax** and **JADE**. **FastICA** [@Hyvarinen2000] will be used for this project, accepting parameters like the number of components to extract, options to center data before ICA decomposition or convergence tolerance. 
@@ -677,13 +677,102 @@ This function performs maximum-likelihood factor analysis on a covariance matrix
 The **RcppDL** package includes a kit of basic, multilayer machine learning algorithms, **Restricted Boltzmann Machines** and **Deep Belief Networks** amongst them. The *rsda()* function is a wrapper to initialise a *deeplearning* object implementing stacked denoising autoencoding on a set of data. It can be then pretrained, fine tuned and used for prediction or classification.  
 
 **Tsne package::tsne()** [@Tsne2016]:
-The **Tsne** package contains only one function, namely *tsne()*, an implementation of the **T-distributed Stochastic Neighbor Embedding** for R. It provides an interface for the application of **t-SNE** on **R** matrices or *dist* objects.
+The **Tsne** package contains only one function, namely *tsne()*, an implementation of the **T-distributed Stochastic Neighbor Embedding** for R. It provides an interface for the application of **t-SNE** on **R** matrices or *dist* objects.  
 
-#4 - Conclussions  
+#4 - Comparative scoring  
 
-#5 - Glossary  
+This section covers the topic of accuracy scoring. Although this may seem like a simple topic ("*best prediction makes best score*") there are nuances to the concept of "*best prediction*".  
 
-#6 - Annexes  
+Measures of classification accuracy are usually extracted from a confusion matrix composed of **true positives** and **true negatives** in a diagonal row, and an assortment of **false negatives** and **false positives** on the other cells. The most simple, most direct measure of accuracy is the proportion between true positives and negatives and the total number of observations; but, as is often the case, *most simple* is not always *more fitting*.
 
-#7 - References  
+##4.1 - Classification accuracy metrics  
+
+There are several metrics commonly used to measure accuracy. Each kind of metric focuses on one or a few aspects of concordance between observed and expected results [@Sokolova2006].  
+
+**Accuracy**: the most direct metric; it's a partial one, even if logically correct. Accuracy is the proportion of correct labels of the studied classes. Thus:  
+
+$accuracy = \frac{tp + tn}{tp + tn + fp + fn}$  
+
+This meaning *total correct predictions divided by total observations*. Although it correctly assesses the proportion of concordance, it takes only this into account. Many times different kinds of errors have a different weight or cost to them. Not being able to distinguish total true positive accuracy and total true negative accuracy is a hindrance in real life context, where failing to correctly identify, as an example, the malignancy of a tumour as positive, may carry more dire consequences than incorrectly identifying an otherwise harmless growth as malignant.  
+
+This need for more specific assessment is reflected in the following metrics.  
+
+**Sensitivity:** It's the ratio of true positives to total real positives (true positives + false negatives). It focuses on the accuracy of the positive class, which in biomedical environments is usually the most important class. Values nearest to 1 are better. It's expressed as:  
+
+$sensitivity = \frac{tp}{tp + fn}$  
+
+**Specificity:** It's the ratio of true negatives to total real negatives (true negatives + false positives). It focuses on the accuracy of the negative class. Values nearest to 1 are better. It's expressed as:  
+
+$sensitivity = \frac{tn}{fp + tn}$  
+
+**Precision:** It's the ratio of true positives to total predicted positives (true positives + false positives). It focuses on how well the model distinguishes factual positive cases. Values nearest to 1 are better. It's expressed as:  
+
+$precision = \frac{tp}{tp + fp}$  
+
+**Fallout:** Also called *False Alarm Rate*, it's the complementary rate to **specificity**, or $fallout = 1 - specificity$. It's the ratio of false positives to total real negatives (false positives + true negatives), and it is expressed as:  
+
+$fallout = \frac{fp}{fp + tn}$  
+
+Depending on the context, **False Alarm Rate** as an error can be equivalent in cost to false negatives or differ in cost. In a medical assesment, where failing to reject the null hypothesis of normality of conditions when it should have been rejected can mean decease or loss of life quality, false positives are **usually** less costly than false negatives.  
+
+**F-Score:** **F-Score** is a technique that measures the discrimination of two sets of real numbers [@Chen2006]. The **F-Score** or $F_1$ **Score** considers both the **precision** and **recall** to compute its value; it's the harmonic average of **precision** and **recall**, and $F_1$ Scores near 1 are best [@Hutchison2013].  
+
+It is expressed as:  
+
+$F-Score = \frac{(\beta^2 + 1) * precision * recall}{\beta^2 * precision * recall}$  
+
+F-Score has been used many times in language recognition, and also in document classification and speech pattern recognition.  
+
+**ROC:** [@Hanley1982] A Receiver Operating Characteristic curve is a graphical interpretation of **sensitivity** against **fallout** in the context of predictive diagnosis. This curve can be plotted as the cumulative distribution function of sensitivity in the vertical axis against fallout on the horizontal axis. The function for the **ROC curve** is expressed as:  
+
+$ROC = \frac{P(x \vert positive)}{P(x \vert negative)}$  
+
+Where $P(x \vert C)$ denotes the conditional probability that a data entry will belong to the C class label [@Sokolova2006]. **ROC** and the *Area Under the Curve* have been widely used as accuracy metrics in studies with assymetric cost functions and imbalanced data sets. **ROC** results can be analyzed in various ways and extracted in many experimental protocols. Usually, the slope and intercept of the curve are used to measure the probability of hits and false alarms. [@Yonelinas2007]  
+
+##4.2 - Binary classification versus multiclass classification metrics  
+
+Classification can be primarily divided by the number of class labels potentially assignable to a sample. With this discriminator in mind, classification can be **binary** or **multiclass**. **Binary classification** ussually takes the form of a **positive** label or a **negative** label. **Multiclass classification** takes more than two states. Although it would seem like a moot difference, depending on a critical analysis of the classification it can be profoundly important for the process of accuracy analysis.  
+
+Most of the accuracy metrics that have been described in the present document depend on the concept of *positive* or *negative* to sort out their measure. Depending on the presented problem, class labels may or may not be ascribed to a positive or a negative state. Neutral-value, descriptive labels won't be able to be classified this way, as their values will be neither *positive* nor *negative*, just a neutral value, distinct and definable state.  
+
+Even so, there may be ways to assimilate these kind of problems to a binary classification. Decomposing class labels in a state of "being or not being", this meaning **belonging** or **not belonging** to a given class, is one way. If the labels are not neutral states, but levels of "positive" and "negative" states, a boundary can be established so that everything above it is positive and everything below it is negative.  
+
+For the problem stated in this document there are three possible labels: *ATYPICAL_LYMPHOCYTE*, *LYMPHOCYTE* and *VARIANT_YMPHOCYTE*. *Atypical lymphocytes* are found in patients with lymphoid neoplasms, including prolymphocytes. *Variant lymphocytes* are reactive lymphocytes. *Lymphocytes* are normal cells. All this means is that all three are distinct states that **can't be ascribed to a binary classification**, at the risk of losing important information.  
+
+An accuracy metric that can be applied to a multiclass classification is needed in order to assess the accuracy of this study. Multiclass accuracy metrics are described in [@Luengo2009]. Multiclass variants to **ROC** are mentioned, although it's stated to be computationally restrictive. **Classification Rate** and **Cohen's Kappa** are also mentioned as simple and successful in their application.  
+
+##4.3 - Classification Rate  
+
+This metric is described as the number of successful hits relative to the total number of classifications. It's been stated to be the most commonly used metric for assessing the performance of classifiers for years.
+
+##4.4 - Cohen's Kappa  
+
+**Cohen's Kappa** [@Luengo2009] is an alternative to **Classification Rate** that takes into account random correct hits. It was originally used to measure the degree of agreement between two subjects describing the same event. In the meantime it has been adapted for classification tasks, as it compensates for random hits in the same way that **AUC** does for **ROC**. The mathematical expression for **Cohen's Kappa** is applied to the contingency table of an event in the following way:  
+
+$kappa = \frac{n \sum_{i=1}^C x_{ii} - \sum_{i=1}^C x_{i.}x_{.i}}{n^2 - \sum_{i=1}^C x_{i.}x_{.i}}$  
+
+Where $x_{ii}$ is the cell count in the main diagonal, *n* is the number of examples, *C* is the number of class values and $x_{.i}x_{i.}$ are the total columns and rows counts, respectively.  
+
+The value range of **Cohen's Kappa** goes from -1 (total disagreement) to 1 (perfect agreement).
+
+##4.5 - Chosen scoring metric  
+
+For this project, the chosen accuracy metric is **Cohen's Kappa**. The reasons are as follows:  
+
+- The data set upon which it is going to be used has a multiclass factor response variable.  
+- Those labels are not ascribable to a binary synthetic class system.  
+- **Cohen's Kappa** yields a scalar, simple value well suited for multiclass classification.  
+- It is more powerful than **Classification Rate**, because it takes into account random hits, scoring successes separately for each class and aggregating them.  
+
+For these reasons, the scoring metric to be applied in this project is **Cohen's Kappa**.
+
+#5 - Comparison methods and protocols  
+
+#6 - Conclussions  
+
+#7 - Glossary  
+
+#8 - Annexes  
+
+#9 - References  
 
