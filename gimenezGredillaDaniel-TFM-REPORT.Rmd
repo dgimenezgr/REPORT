@@ -10,18 +10,31 @@ output:
     fig_caption: yes
     includes:  
       in_header: tex-support.tex
+      after_body: [
+        comparison_code_R.Rmd,
+        comparison_code_python.Rmd
+      ]
 options:
   encoding: utf8
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, fig.lp = "Fig. ", tidy.opts=list(width.cutoff=60),tidy=TRUE, cache = TRUE, fig.width=12, fig.height=4, comment = NULL, out.height='200px', dpi=200, fig.pos = 'h', out.extra = '')
+knitr::opts_chunk$set(echo = TRUE, engine.path = list(python = 'C:/Program Files (x86)/eMule/python/python.exe'), fig.lp = "Fig. ", tidy.opts=list(width.cutoff=60),tidy=TRUE, cache = TRUE, fig.width=12, fig.height=4, comment = NULL, out.height='200px', dpi=200, fig.pos = 'h', out.extra = '')
 ```
+
 
 ```{r library_load, echo=FALSE, message=FALSE}
 require(knitr)
+require(stats)
+require(caret)
+require(e1071)
+require(ica)
+require(psych)
+require(MASS)
 require(ggplot2)
+require(ggfortify)
 require(reshape2)
+require(DMwR)
 ```
 
 \pagebreak  
@@ -44,7 +57,15 @@ This diagnosis involves, as part of the protocol, visual morphological analysis 
 knitr::include_graphics('./images/2-blood-smear.jpg')
 ```
 
-[@Naugler2014] (Descripción de técnicas y contenido general)  
+As blood smear image examination is a tedious and time consuming process [@Naugler2014], many algorithms have been developed to automate the process. Image recognition and segmentation is used to prepare the input, sually dividing the cell image into masks. A cell mask is produced, by selecting the cell in between all of the complex elements of the image. The cell is then divided into semantically significant regions (*e.g.* nucleus mask or cytoplasm mask) through image segmentation, via techniques like the *Watershed Algorithm* or machine learning algorithms like *Support Vector Machines (SVMs)*. This image processing step is crucial for a good classification workflow, as it prepares the input for the following steps.  
+
+The next step is feature selection/extraction, in which a group of features is measured in order to use these quantitative values for classification. Good features must be informative. Features that largely overlap between classes don't offer a significant amount of distinctiveness, Becuase of this, the features selected or extracted must be **very similar inside the same class** and **distinctive between classes**. White blood cells are wildly different between them, varying substantially between cell families, and even if there are features that are observably different between families, **not all features** will be significant for a classification task.  
+
+The last step is the classification itself. Classification demands for a pattern to be established that can reliably assign a given sample to a given class. There are many machine learning algorithms used to find these patterns, such as *ANN's* or *SVMs*. For the purposes of this project, a focus will be given to *SVMs*.  
+
+*Support Vector Machines* are a machine learning algorithm first introduced by Vladimir Vapnik [@Leslie2002]. They aim to find one or a set of hyperplanes that divide the sample space into categories, as cleanly as possible and with as little interference of samples from one space into another. This or these hyperplanes are then used to classify new test samples into one of the original classe.  
+
+In a non-ideal, more realistic background, samples won't be always cleanly separated into smooth groups. This situation is managed by searching for a compromise between maximum classification accuracy and a reasonable classification error. Different *kernels* can also be introduced in the *SVM* algorithm in order to improve the classification results.  
 
 The morphological features of peripheral blood cells were first translated into a mathematical scoring system by Benattar and Flandrin [@Benattar2001]. Mathematical measurement of these features induces intraobserver and interobserver objectivity and allows for a quantitative assesment of cell features, being the ones in abnormal lymphocytes the most difficult to identify. Thus, mathematical morphology tools have been developed with the aim of processing peripheral blood images and extracting and processing sets of features which are then used to classify the cell. These features need to be constructed and optimized for best performance and accuracy of the derived classification, or, in some cases, risk being affected by the *Curse of Dimensionality*.  
 
@@ -74,7 +95,7 @@ The problem of dimensionality is solved through dimension reduction techniques (
 knitr::include_graphics('./images/5-relevant-features.png')
 ```
 
-Data analysis was performed with R code, validating for residual normality through Kolmogorov-Smirnov, homocedasticity through Flingner-Killeen, significance through Kruskal-Wallis and multiple comparisons through Kruskal-Wallis after Dunn tests applying a Bonferoni adjustment.  
+Data analysis was performed with **R** code, validating for residual normality through Kolmogorov-Smirnov, homocedasticity through Flingner-Killeen, significance through Kruskal-Wallis and multiple comparisons through Kruskal-Wallis after Dunn tests applying a Bonferoni adjustment.  
 
 The selected features allowed for the quantification of different morphological characteristics with significant p-values, being *N/C ratio* the best feature for distinction.
 
@@ -297,6 +318,141 @@ All milestones have been completed and the grounds for the second phase of the p
 
 Given the development state of the project, in which a theoretical background has been stated and tools have been selected, the only product for this phase is the current monitoring report. It is expected, as part of the project's plan, that the second phase will yield the final products.  
 
+###1.4.8 - Briefing: second monitoring report - December 2017
+
+**Development state:**  
+
+The project's tasks have been largely completed by this point, given some extra tasks that are detailed here and unforeseen circumstances and hindrances that were buffered through corrective or paliative action.  
+
+**Undertaken tasks:** 
+
+2.1.1 - Elaborate a short briefing on the value of prediction accuracy as output by this packages. (4 days, 12 hours equivalent)  
+
+**State: Complete - In schedule.**
+
+2.1.2 - Assess the validity of it for all the packages selected, and, if it is not valid for all of them, extrapolate a valid, normalized scoring system. (6 days, 18 hours equivalent)  
+
+**State: Complete - In schedule.**
+
+2.2.1 - Apply each and every package's or function's workflow to the supplied lymphocyte data. (4 days, 12 hours equivalent)  
+
+**State: Complete - Out of schedule.**
+
+2.3.1 - Present the score output of each of the applications in a user-friendly manner. (3 days, 9 hours equivalent) 
+
+**State: Complete - Out of schedule.**
+
+2.3.2 - Extract behaviour/comparison conclussions from this score output. (4 days, 12 hours equivalent)
+
+**State: Complete - Out of schedule.**
+
+2.3.3 - Elaborate monitoring report for **Phase 2**. (8 days, 24 hours equivalent)
+
+**State: Complete - Out of schedule.**  
+
+**Unscheduled activities**  
+
+As part of the tasks undertaken, it has been necessary to upgrade the technical resources available to the author. The machine in which the project's computation is run is a **Hewlett Packard Proliant Gen 8** microserver. It has proven reliable and sturdy, but not powerful enough for some of the proceedings. As such, more RAM and a more powerful processor were acquired and the server was modded with them. This process took the best part of two days of work, from November 30th through December 2nd.  
+
+**Incomplete tasks:**  
+
+There were no incomplete tasks.
+
+**Hindrances and unforeseen circumstances:**  
+
+In the original planning, possible sources of deviation and obstacles were proposed as:
+
+**1. Technical problems:** A single, important technical problem has arised when undertaking the second phase of this project: computing power. For some of the dimensional reduction techniques (**PCA** and **ICA**) the processing times and virtual memory requirements were met even under the most stringent parameters. On the other hand, some of the least tried or most resource-heavy techniques (**Stacked Denoising Autoencoders** and **T-Stochastic Neighbor Embedding**) repeatedly hit a technical roof which hindered the progress of this project.
+
+**2. Goal overextension:** no problems associated with overextension have arised. The scheduled objectives have been deemed by the author as realistic and, apart from other hindrances, achievable.  
+
+**3. Incompatibilities:** no incompatibilities have been found neither in practice nor in literature.  
+
+As such, technical buffering measures were undertaken. In the first place, method optimisation techniques were tested, such as the use of resource-light variable structures as turning data frames into sparse matrices or garbage-collection methods after each iteration of the processes, but none of them lowered the requirements in a manner significant enough to be able to complete them to satisfaction.  
+
+As this was clearly a hard-cap problem, an **Intel® Xeon® E3-1265L** processor, and two 8Gb **Kingston DIMM 1600 Mhz 240 pins** RAM chips were acquired in order to be able to parallelize processing and provide the machine with a higher virtual memory roof. This microserver modification took the best part of two days of work and brought with it a total blackout in computing during this time. This blackout time was put to use in redaction and problem-solving research.
+
+**Update - milestones:**  
+
+With the briefed hindrances in mind, the original milestone table is updated as follows:  
+
+```{r phase_2_monitoring_table, echo=FALSE}
+ms_4 <- c("28-NOV-2017","Scoring system completely defined")
+ms_5 <- c("08-DEC-2017","Complete set of workflows applied")
+ms_6 <- c("18-DEC-2017","Behaviour/comparison conclussions from output elaborated")
+ms_7 <- c("18-DEC-2017","Monitoring report for Phase 2")
+p2_ms <- data.frame(rbind(ms_4,ms_5,ms_6,ms_7)) 
+kable(p2_ms, caption = "Phase 2 milestones", align = c('l','l'), col.names = c("Deadline","Milestone"), row.names = FALSE)
+```
+
+###1.4.9 - Final Gantt Diagram (after alterations)
+
+Referring to the original the Gantt diagram presented within the initial plan:  
+
+```{r calendar_2, echo=FALSE}
+task7 <- c('2.1.1 - Elaborate accuracy briefing', '2017-11-20', '2017-11-24')
+task8 <- c('2.1.2 - Assess validity of accuracy', '2017-11-24', '2017-11-30')
+task9 <- c('2.2.1 - Application of workflows', '2017-11-30', '2017-12-03')
+task10 <- c('2.3.1 - Presentation of score', '2017-12-03', '2017-12-06')
+task11 <- c('2.3.2 - Extract conclussions', '2017-12-06', '2017-12-10')
+task12 <- c('2.3.3 - Elaborate monitoring report 2', '2017-12-10', '2017-12-18')
+
+tasks <- as.data.frame(rbind(task12, task11, task10, task9, task8, task7))
+names(tasks) <- c('task', 'start', 'end')
+tasks$task <- factor(tasks$task, levels = tasks$task)
+tasks$start <- as.Date(tasks$start)
+tasks$end <- as.Date(tasks$end)
+tasks_melted <- melt(tasks, measure.vars = c('start', 'end'))
+
+start_date <- as.Date('2017-10-17')
+ 
+ggplot(tasks_melted, aes(value, task)) + 
+  geom_line(size = 5, colour = "blue") +
+  labs(x = '', y = '', title = 'Task time allocation - Gantt Chart') +
+  theme_bw(base_size = 30) +
+  theme(plot.title = element_text(hjust = 0.5),
+        panel.grid.major.x = element_line(colour="black", linetype = "dashed"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        text = element_text(size=12),
+        axis.text.x = element_text(angle = 0)) +
+  scale_x_date(date_labels = "%d %b %Y", limits = c(start_date, NA), date_breaks = '1 week')
+ 
+```
+
+The planned tasks were slowed down by the aforementioned technical problem. Deviations were mainly focused in **task 2.2.1 - Application of workflows**. The unplanned use of two days was distributed evenly amongst all the following tasks, so the original Gantt diagram is recast as follows:  
+
+```{r new_calendar, echo=FALSE}
+task7 <- c('2.1.1 - Elaborate accuracy briefing', '2017-11-20', '2017-11-24')
+task8 <- c('2.1.2 - Assess validity of accuracy', '2017-11-24', '2017-11-30')
+task9 <- c('2.2.1 - Application of workflows', '2017-11-30', '2017-12-05')
+task10 <- c('2.3.1 - Presentation of score', '2017-12-05', '2017-12-08')
+task11 <- c('2.3.2 - Extract conclussions', '2017-12-08', '2017-12-12')
+task12 <- c('2.3.3 - Elaborate monitoring report 2', '2017-12-12', '2017-12-18')
+
+tasks <- as.data.frame(rbind(task12, task11, task10, task9, task8, task7))
+names(tasks) <- c('task', 'start', 'end')
+tasks$task <- factor(tasks$task, levels = tasks$task)
+tasks$start <- as.Date(tasks$start)
+tasks$end <- as.Date(tasks$end)
+tasks_melted <- melt(tasks, measure.vars = c('start', 'end'))
+
+start_date <- as.Date('2017-10-17')
+ 
+ggplot(tasks_melted, aes(value, task)) + 
+  geom_line(size = 5, colour = "blue") +
+  labs(x = '', y = '', title = 'Task time allocation - Gantt Chart') +
+  theme_bw(base_size = 30) +
+  theme(plot.title = element_text(hjust = 0.5),
+        panel.grid.major.x = element_line(colour="black", linetype = "dashed"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        text = element_text(size=12),
+        axis.text.x = element_text(angle = 0)) +
+  scale_x_date(date_labels = "%d %b %Y", limits = c(start_date, NA), date_breaks = '1 week')
+ 
+```
+
 ##1.5 - Brief summary of products obtained  
 
 ###1.5.1 - Work plan
@@ -323,7 +479,7 @@ In the course of this project, an automated comparison report script will be pro
 
 ###1.5.4 - Virtual presentation
 
-The virtual presentation for this project will be carried out through **Present@**, a presentation tool offered by **Universitat Oberta de Catalunya** for the display of project results. This presentation will be comprised of approximately 20 slides with an oral presentation for a maximum of 20 minutes. This presentation's aim is to be as concise and informational as possible, while delivering the results and conclussions of the project in a clean, outreaching way.  
+The virtual presentation for this project will be carried out through Present@, a presentation tool offered by **Universitat Oberta de Catalunya** for the display of project results. This presentation will be comprised of approximately 20 slides with an oral presentation for a maximum of 20 minutes. This presentation's aim is to be as concise and informational as possible, while delivering the results and conclussions of the project in a clean, outreaching way.  
 The presentation will be produced between the $3^{rd}$ and $10^{th}$ of January 2018, January the $10^{th}$ being the deadline. Of special importance is the content, synthetic ability and clarity of purpose and expression. Evaluation criteria have been provided by the project's tutor.
 
 ###1.5.5 - Project self-evaluation
@@ -342,8 +498,49 @@ This project's self-evaluation will confront it from two angles: first, a side-b
 
 ##1.6 - Brief description of other chapters  
 
-**"Dimension reduction: an introduction"**: A brief presentation of the main topic in this project. What they are, what they are useful for.  
-**"PCA"**: 
+**2 - Dimension reduction: an introduction**: A brief presentation of the main topic for this project. What they are, what they are useful for.  
+
+**2.1 - PCA**: Historical and mathematical background of this technique, and reasons for its selection.
+
+**2.2 - ICA**: Historical and mathematical background of this technique, and reasons for its selection.
+
+**2.3 - Factor Analysis**: Historical and mathematical background of this technique, and reasons for its selection.
+
+**2.3 - Autoencoders**: Historical and mathematical background of this technique, and reasons for its selection.
+
+**2.4 - T-distributed Stochastic Neighbor Embedding**: Mathematical background of this technique, and reasons for its selection.
+
+**2.5 - LDA**: Historical and mathematical background of this technique, and reasons for its selection.  
+
+**3 - Tools**: Languages and packages used for this project.  
+
+**3.1 - Criteria**: Criteria through which these tools were selected.  
+
+**3.2 - Python**: History, modules and implementations from this language used for the current project.  
+
+**3.3 - R**: History, packages and libraries and implementations from this language used for the current project.  
+
+**4 - Comparative Scoring**: Assessment of an objective, measurable way to compare dimension reduction techniques.  
+
+**4.1 - Classification Accuracy Metrics**: A general look at the ways in which prediction accuracy is measured.  
+
+**4.2 - Binary Classification Versus Multiclass Classification Metrics**: On how different accuracy metrics are best suited to evaluating classifiers with two classes or more.  
+
+**4.3 - Classification Rate**: Focus on this multiclass accuracy metric.  
+
+**4.4 - Cohen's Kappa**: In-depth look at this multiclass accuracy metric.  
+
+**4.5 - Chosen Scoring Metric**: The metric to be used in this project and reasons for it.  
+
+**5 - Comparison Methods and Protocols**: Previously explained techniques and implementations, put to work.
+
+**5.1 - Introduction and General Data Set Description**: A brief introduction to the data being treated, and ways to sort out imbalance.  
+
+**5.2 - Goals and techniques**: Brief resume of techniques being implemented.  
+
+**5.3 - Dimension Reduction techniques - R**: **R** implementations of the selected dimension reduction techniques.  
+
+**5.4 - Dimension Reduction techniques - Python**: **Python** implementations of the selected dimension reduction techniques.  
 
 #2 - Dimension reduction: an introduction  
 
@@ -451,7 +648,7 @@ Where $H(y_{gauss})$ is the entropy value of a gaussian variable of the same cov
 
 ###2.2.3 - Selection  
 
-Other studies have already been centered around the comparison of *PCA* and *ICA* on different fields, such as [@TibaduizaBurgos2013] or [@Pet2010]. *ICA* is a widely-used, exhaustively applied to bioinformatics linear dimension reduction technique that rivals *PCA* in terms of use. Algorithms for this technique have been developed in popular bioinformatics programming languages, in Open Source environments, that are available for researchers to use.
+Other studies have already been centered around the comparison of *PCA* and *ICA* on different fields, such as [@TibaduizaBurgos2013]. *ICA* is a widely-used, exhaustively applied to bioinformatics linear dimension reduction technique that rivals *PCA* in terms of use. Algorithms for this technique have been developed in popular bioinformatics programming languages, in Open Source environments, that are available for researchers to use.
 
 *ICA* uses a different method to derive principal components, being this nongaussianity. Even though this tecnique doesn't rank principal components, this is not critical to the present study, as the main objective is the accuracy of prediction.  
 
@@ -580,9 +777,19 @@ $KL(P||Q) = \sum_{i \neq j} p_{ij} log \frac{p_{ij}}{q_{ij}}$
 
 The **T-SNE** algorithm is a useful dimension reduction technique that allegedly gives a better visualization of complex data sets and solves the original problem of the technique, namely the *crowding problem*. It has been applied in the fields of computer security, cancer research, image recognitiona and bioinformatics, and given the current state of its application in bioinformatics programming languages and frameworks, it is deemed to be a qualitative addition to this study.  
 
+##2.6 - LDA  
+
+**Linear Discriminant Analysis**, or **LDA**, is a generalization of *Fisher's Linear Discriminant*. It is a well-known technique for feature extraction, and it has been widely used for such uses as facial recognition, image retrieval or microarray data classification. **LDA** focuses on the response variable classes. It projects the data onto a lower-dimensional vector space such that the ratio of the between-class distance to the within-class distance is maximized, thus achieving maximum discrimination.  
+
+Mathematically, given a data matrix $A$, classical **LDA** aims to find a transformation that maps each column $a_i$ of $A$, for $1 \leq i \leq n$ in the *N*-dimensional space to a vector $b_i$ in the *l*-dimensional space. It creates clusters, such that the quality of each cluster is high if it is well-separated from other clusters and tightly grouped [@Klecka1980].  
+
+###2.6.1 - Selection
+
+The **Linear Discriminant Analysis** technique has been selected because of its **pattern recognition** capabilities, and the fact that it has been shown to perform well in multiclass classification. It's been implemented in both of the programming languages that will be used in this project, and it is included in packages and modules of wide use and tested good performance.
+
 #3 - Tools  
 
-Digital tools for this project are described in this section. It will cover a brief definition, some historical background where available, and a collection of packages, libraries, modules, etc. to be used for each. All code used or created is available on **Annex [X]: Code**.  
+The digital tools used for this project are described in this section. It will cover a brief definition, some background where available, and a collection of packages, libraries, modules, etc. to be used for each. All code used or created is available on **Annex I: Code**.  
 
 ##3.1 - Criteria  
 
@@ -618,7 +825,7 @@ Changing to commercial software development in 2000, Guido Van Rossum felt that 
 
 Guido Van Rossum and the other PythonLabs developers have since then joined *Digital Creations*. All their work from then on is owned by the *PSF* (*Python Software Foundation*), a non-profit foundation modeles after the *Apache Software Foundation*.  
 
-###3.2.2 - Packages and libraries  
+###3.2.2 - Modules  
 
 The following **Python** modules and functions are used in this project. Every module is provided with citation where available.  
 
@@ -638,6 +845,9 @@ Keras is a high-level neural networks API developed for Python and developed for
 
 - T-Distributed Stochastic Neighbor Embedding: *sklearn.manifold.TSNE()*.
 Even though this implementations documentation states the need for a previous dimension reduction technique for fully significant results, for the sake of comparison equality it will be used on the data set as is, with all the original variables.  
+
+- Linear Discriminant Analysis: *sklearn.discriminant_analysis.LinearDiscriminantAnalysis()*.
+This function is a classifier with a linear decision boundary. It's implemented in Scikit-learn, as part of the main module.
 
 **NumPy and SciPy**: these two modules act as dependencies for **Scikit-learn**. **NumPy** [@Walt2011] arrays are the standard object for data representation in **Python**. These arrays can have any number of dimensions and can contain other kinds of elements. **ScyPy** [@Scipy2001], is a collection of algorithms and  functions built on **Numpy**. It adds high-level commands and classes for manipulating and visualizing data.  
 
@@ -678,6 +888,9 @@ The **RcppDL** package includes a kit of basic, multilayer machine learning algo
 
 **Tsne package::tsne()** [@Tsne2016]:
 The **Tsne** package contains only one function, namely *tsne()*, an implementation of the **T-distributed Stochastic Neighbor Embedding** for R. It provides an interface for the application of **t-SNE** on **R** matrices or *dist* objects.  
+
+**MASS package::lda()** [@Mass2017]:
+The **MASS** package contains datasets and functions used in **Venables** and **Ripley** *Modern Applied Statistics with S*. As part of the package it includes several feature extraction techniques, amongst which is **LDA**.  
 
 #4 - Comparative scoring  
 
@@ -768,11 +981,719 @@ For these reasons, the scoring metric to be applied in this project is **Cohen's
 
 #5 - Comparison methods and protocols  
 
+##5.1 - Introduction and general data set description  
+
+```{r data_var_declare, include=FALSE, echo=FALSE}
+data_class_factors <- 7
+data_class_numeric <- 2867
+data_response_index <- 2
+
+```
+```{r data_load, include=FALSE, echo=FALSE}
+#Tipos de variable por columna
+colClasses <- append(c(rep("factor",data_class_factors)),c(rep("numeric",data_class_numeric)))
+#Carga de los datos del CSV
+data_df <- read.csv2(file = "data/data.csv", sep = ",", dec = ".", colClasses = colClasses, stringsAsFactors = FALSE)
+#Fórmula del modelo
+data_formula <- as.formula(paste(colnames(data_df[data_response_index]), "~", paste(colnames(data_df)[-(1:data_class_factors)], collapse=" + ")))
+#Balancear datos con SMOTE. ROSE sólo funciona para clasificaciones binarias.
+data_df_bal <- SMOTE(data_formula, data_df, perc.over = 200)
+
+#Semilla para aleatorización controlada
+set.seed(123)
+
+#Subsets de predictores y respuestas
+data_df_predictors <- data_df_bal[,8:2874]
+data_df_predictors <- scale(data_df_predictors)
+data_df_responses <- data_df_bal[,data_response_index]
+
+#Índices para training
+data_train_index <- sample(1:nrow(data_df_bal), ceiling(nrow(data_df_bal)*.66))
+write.table(as.vector(data_train_index), file = "data/data_train_index.csv",row.names=FALSE,col.names=FALSE, sep=",")
+
+#Subset de respuestas de training
+data_df_train_responses <- data_df_responses[data_train_index]
+#Subset de respuestas de test
+data_df_test_responses <- data_df_responses[-data_train_index]
+
+```
+
+The current data set is a study on abnormal lymphoid cells circulating in peripheral blood, as stated in [@Puigvi2017]. The study included mature lymphocytes from healthy individuals, abnormal lymphocytes from patients with CLL, B-PLL, HCL, SMZL, MCL, FL, T-PLL, T-LGL, Sézary syndrome, LB from patients with B-lymphoid precursor neoplasms and RL from patients with viral or other infections, in which 2867 numerical variables, based on colorimetric and geometric features have been measured.  
+
+The current data set has `r length(data_df[,1])` observations for `r length(data_df[1,])` variables, of which `r data_class_factors` (in which the response variable, *tipoCelula*, is included) are factors and `r data_class_numeric` are numeric predictor variables.   
+
+The response variable, *tipoCelula*, has three levels, being these **ATYPICAL_LYMPHOCYTE**, **VARIANT_LYMPHOCYTE** and **LYMPHOCYTE**. Two subsets will be generated with this data, a training set comprising 66% of all data, and a test set formed by the remaining entries. Both sets are generated by defining a random seed with the *set.seed()* function (the seed beeing 123) and applying that seed, either to the *sample()* function in R, or to the *train_test_split()* function in **Python** to generate, respectively, either an array of indexes or the training-test subsets themselves.  
+
+###5.1.2 - Class imbalance problem
+
+While dyagnosing the data set, a single look at the response classes is enough to find a pronounced imbalance in the number of observed classes. There is an important proportion of **atypical** lymphocytes, in respect to the **variant** and **normal** lymphocytes. Such imbalance can create an artifact of classification. In this case, this artifact would be less costly, as it would skew towards an excessive zeal when classifying **atyipical** lymphocytes, but still, it's a source of noise that should be avoided when possible.  
+
+Highly imbalanced datasets bring with them the problem of **random accuracy**. If a data set, such as the one being assessed in this project, has, let it be said 75% of samples in one class, there's an initial chance that by pure, random luck, predicting all test samples as belonging to that class will yield a 75% accuracy score.  
+
+There are several class balancing techniques designed to avoid this artifact. As stated in [@Barandela2004], basic methods for reducing class imbalance can be sorted in three groups:
+
+- Over-sampling, which aims to replicate samples in the minority group to artificially augment its representation.  
+- Under-sampling, which serves the opposite goal, to cut samples from the majority group.  
+- Internally biasing the discrimination based process in order to balance the classes.  
+
+Also, there is a hybrid approach, which relies on both over- and under-sampling to bring the classes to a balance. This is the approach that will be used and discussed in this project.  
+
+###5.1.3 - The SMOTE() function  
+
+**SMOTE** (*Synthetic Minority Oversampling Technique*) [@Ramentol2012] is a data-level balancing approach, in opposition to learning-algorithm approaches. These are said to be more versatile, as its use is independent of the protocol followed and can then be used to train any classifier.  
+
+The **SMOTE** algorithm oversamples the minority class by introducing synthetic minority class examples along the line segments that join the *k* nearest neighbors. What it does is take each of these *k* nearest neighbors, randomly chosen, and substract it from the sample in question. Then multiply the difference by a random value between 0 and 1, and add this point as a new minority class example.
+
+Even though **SMOTE** itself is an over-sampling method, it is implemente as a hybrid approach by **R** in the *SMOTE()* function, from the **DMwR** package. This function, which will be used for this dataset, under- and over-samples the data set, with parameters allowing to put focus on one or both. For this project, given the aim to over-sample the minority class, focus will by put on this by setting the *perc.over* parameter to 200.
+
+##5.2 - Goals and techniques  
+
+This script aims to assess the comparative performances of different dimension reduction techniques. They will be measured for a common accuracy metric and judged by their processing performance. Being **PCA** the most used, most assessed technique, it will be used as a kind of touchstone in respect to requirements for the other techniques in **R**. This techniques will then be replicated in their **Python** implementations keeping, as much as possible, all parameters as a measure of objectivity between both languages.  
+
+Other optional parameters, where possible, will be kept to a minimum. The reason for this is to assess the validity of techniques out of fine-tuning, in their most raw conditions, as fine-tuning each of them would be a matter for a latter study.
+
+For the effects of this project, the benchmark minimum number of extracted features is that which satisfies one condition, being this that these extracted features account for an accumulated 95% of variance in the reference dimensionality reduction technique, **PCA**. Having determined this, a continued test of cumulative numbers of extracted features, between a floor of 10 and an estimative limit of 250 yields the following result.  
+
+```{r data_pca_features_number, include=FALSE, echo=FALSE}
+#Calcular componentes principales
+data_pca <- prcomp(data_df_predictors)
+#Sacar el sumario de la PCA.
+data_pca_summary <- summary(data_pca)
+#Calcular las features que explican al menos el 95% de la varianza
+for (i in seq(from = 10, to = 250, by = 10)) {
+  data_varExp <- sum(data_pca_summary$importance[2,1:i])
+  if (data_varExp >= 0.95) {
+    varImpMessage <- paste("For ", i, " components, the percentage of variance explained is ",data_varExp, ".", sep = '')
+    data_optimal_exfeat <- i
+    return(varImpMessage)
+  }
+}
+```
+
+```{r data_exfeat_message, include = FALSE, results='asis'}
+cat(varImpMessage)
+```
+
+With this number of extracted features as an objective benchmark, the following techniques will be conducted:  
+
+- **PCA**  
+- **ICA**  
+- **Factor Analysis**  
+- **Linear Decomposition Analysis**  
+
+The resulting features will then be divided in training and test sets, and used as input, first, for the fitting and training of an **SVM** function (*svm()*, from the *caret* package for **R** and *sklearn.svm.SVC()* for **Python**), and then as input of a *predict()* function, from the *stats* package for **R**, and a *fit().predict()* pipeline for **Python**. The predicted classes will then be cross-tested with the actual test classes. A confusion matrix and a Cohen's Kappa weighted value will then be output, and used as that technique's entry in the final performance comparison.  
+
+**Cohen's Kappa** [@Luengo2009] is an alternative to **Classification Rate** that takes into account random correct hits. It was originally used to measure the degree of agreement between two subjects describing the same event, in psychology, but has since then been implemented for accuracy testing in other fields. It has been adapted for classification tasks, as it compensates for random hits in the same way that **AUC** does for **ROC**. The mathematical expression for **Cohen's Kappa** is applied to the contingency table of an event in the following way:  
+
+$kappa = \frac{n \sum_{i=1}^C x_{ii} - \sum_{i=1}^C x_{i.}x_{.i}}{n^2 - \sum_{i=1}^C x_{i.}x_{.i}}$  
+
+Where $x_{ii}$ is the cell count in the main diagonal, *n* is the number of examples, *C* is the number of class values and $x_{.i}x_{i.}$ are the total columns and rows counts, respectively.  
+
+The value range of **Cohen's Kappa** goes from -1 (total disagreement) to 1 (perfect agreement).
+
+The reasons for chosing **Cohen's Kappa** as accuracy metric are as follows:  
+
+- The data set upon which it is going to be used has a multiclass factor response variable.  
+- Those labels are not ascribable to a binary synthetic class system.  
+- **Cohen's Kappa** yields a scalar, simple value well suited for multiclass classification.  
+- It is more powerful than other multiclass accuracy metrics such as **Classification Rate**, because it takes into account random hits, scoring successes separately for each class and aggregating them.  
+
+Weighted and unweighted values of **Cohen's Kappa** differ, as their name implies, in that weighted scores take into account the differential weights of several levels of disagreement between observed and predicted classes. This is a level of information that is lost in binary classification, as all disagreements between observed and predicted classes share the same level of disagreement.  
+
+##5.3 - Dimension Reduction Techniques - R  
+
+###5.3.1 - PCA  
+
+PCA is the most used unsupervised, linear dimension reduction technique currently available. It is also the best, in the mean-square error sense [@Fodor2002]. Its central idea is the construction of a set of features from a number of initial variables [@Jolliffe2002]. The number of new features will be less than the initial variables, while retaining as much as possible of the initial variation. This is achieved by linear transformations of the original data, and then establishing a descending order of the new features attending to the amount of variation retained or explained by each of them.  
+
+For this project, `r data_optimal_exfeat` are retained and use in the fitting, training and prediction of classes. The following section depicts the results of this protocol.  
+
+```{r data_pca, include=FALSE, echo=FALSE}
+#De los componentes principales, escoger los primeros 210
+data_pca_exfeat <- data_pca$x[,1:data_optimal_exfeat]
+#Generar los sets de training y test
+data_pca_train <- subset(data_pca_exfeat[data_train_index,])
+data_pca_test <- subset(data_pca_exfeat[-data_train_index,])
+#Ajustar una SVM con las 20 componentes principales extraídas
+data_pca_svm <- svm(data_pca_train, y = data_df_train_responses, type = "C-classification", kernel = "radial")
+#Usar esa SVM para predecir las respuestas
+data_pca_predict <- stats::predict(data_pca_svm, data_pca_test)
+#Tabular y sacar la Kappa de Cohen
+data_pca_table <- table(data_df_test_responses, data_pca_predict)
+data_pca_perc_table <- prop.table(data_pca_table)*100
+data_pca_perc_hit <- sum(diag(data_pca_perc_table))
+data_pca_cohen <- cohen.kappa(data_pca_table, n.obs = length(data_df_test_responses))
+```
+
+The data set, previously scaled and balanced via a *SMOTE* function, is fitted to a **PCA**. The optimal amount of PC's (*Principal Components*) is retained, and the resulting, transformed data set, is subset into training and test sets. They're are then used to train an **SVM** C-clasiffication type protocol, and predict the test classes.
+
+After fitting and predicting, the  hit and hit percentage values are extracted and represented in **Table 5** and **Table 6**, in absolute and percentage values, respectively.  
+
+```{r data_pca_table, echo=FALSE, results='asis'}
+kable(data_pca_table, caption = 'PCA observed (vertical) versus predicted (horizontal) results', digits = 2, format = "latex")
+```
+
+```{r data_pca_perc_table, echo=FALSE, results='asis'}
+kable(data_pca_perc_table, caption = 'PCA observed (vertical) versus predicted (horizontal) results - percentages', digits = 2, format = "latex")
+```
+
+**PCA** yields a weighted Cohen's Kappa value of `r round(data_pca_cohen$weighted, 2)`, which will be a benchmark for other techniques.
+
+As a visual, informative measure, it is interesting to have the pca fitted components plotted, coloured by *tipoCelula* label.  
+
+```{r data_pca_autoplot, echo=FALSE, results='asis'}
+#autoplot(data_pca, data = data_df, colour = 'tipoCelula')
+```
+
+Points in space are grouped by factors and colored by response label.
+
+###5.3.2 - ICA  
+
+Independent Component Analysis (*ICA*) is a statistical method for transforming an observed multidimensional random vector into components that are statisticaly as independent from each other as possible, this is, a tendency to **redundancy reduction** [@Tobergte2013]. In its linear approach, as with other dimension reduction algorithms, its goal is to take a zero-mean, *m*-dimensional variable, and by means of a linear transformation, find its *n*-dimensional transform, such that $n \le m$, this transformation having some suitable properties. The vectors obtained from this transformation are neither orthogonal nor ranked in order.  
+
+Feature extraction is a prominent application of *ICA*. It is originally motivated by results in neuroscience that suggest that the same cited principle of redundancy reduction is applied by the brain for the early processing of sensory data.  
+
+*ICA* is a generative model (it describes how the observed data are generated by describing the components), and it seeks the minimization of mutual information between the transformed variables. It depends on the supposition of nongaussianity for the data; gaussian data is independent and of mean zero, it has no skewness and as such can only be estimated up to an orthogonal transformation [@Hyvarinen2000].  
+
+Applying it to the current data set, the results are as follows:  
+
+```{r data_ica, include=FALSE, echo=FALSE}
+#Extraer 210 features
+data_ica <- icafast(data_df_predictors, nc = data_optimal_exfeat)
+data_ica_exfeat <- data_ica$S
+#Generar los sets de training y test
+data_ica_train <- subset(data_ica_exfeat[data_train_index,])
+data_ica_test <- subset(data_ica_exfeat[-data_train_index,])
+
+#Someter esas 210 features (la matriz de señales S) a SVM
+data_ica_svm <- svm(data_ica_train, y = data_df_train_responses, type = "C-classification", kernel = "radial")
+#Predecir con el modelo ajustado las respuestas
+data_ica_predict <- stats::predict(data_ica_svm, data_ica_test)
+#Tabular datos y sacar Kappa de Cohen
+data_ica_table <- table(data_df_test_responses, data_ica_predict)
+data_ica_perc_table <- prop.table(data_ica_table)*100
+data_ica_perc_hit <- sum(diag(data_ica_perc_table))
+data_ica_cohen <- cohen.kappa(data_ica_table, n.obs = length(data_df_test_responses))
+```
+
+The data set, previously scaled and balanced via a *SMOTE* function, is fitted to a **ICA**. The optimal amount of extracted features is retained, and the resulting, transformed data set, is subset into training and test sets. They're are then used to train an **SVM** C-clasiffication type protocol, and predict the test classes.
+
+After fitting and predicting, the  hit and hit percentage values are extracted and represented in **Table 7** and **Table 8**, in absolute and percentage values, respectively.  
+
+```{r data_ica_table, echo=FALSE, results='asis'}
+kable(data_ica_table, caption = 'ICA observed (vertical) versus predicted (horizontal) results', digits = 2, format = "latex")
+```
+
+```{r data_ica_perc_table, echo=FALSE, results='asis'}
+kable(data_ica_perc_table, caption = 'ICA observed (vertical) versus predicted (horizontal) results - percentages', digits = 2, format = "latex")
+```
+
+Curiously, **ICA** yields results similar to **PCA**, with a weighted Cohen's Kappa of `r round(data_ica_cohen$weighted, 2)`. Even though this puts it at eye level with **PCA**, the processing power needed for this technique is noticeably larger, and thus, the hollistic assessing of **ICA** still has it behind **PCA**.
+
+```{r data_ica_autoplot, echo=FALSE, results='asis'}
+#plot(data_ica)
+```
+
+```{r data_garbage_collect_1, include=FALSE, echo=FALSE}
+gc()
+```
+
+###5.3.3 - Factor Analysis  
+
+The basic idea underlying Factor Analysis is that *p* observed random variables, **x**, can be expressed, except for an error term, as linear functions of $m(<p)$ hypothetical (random) variables or *common factors* [@Jolliffe2002]. The aim of Factor Analysis is to group variables that share a "common theme" under the same grouping, such that the dimensionality of the dataset is decreased.  
+
+Factor Analysis has been applied in psychology to identify groups of inter-related variables, as those components of intelligence that can be placed under a single factor *g* or *general intelligence*, grouping factors such as *broad visual perception* (it includes all the intelligence variables related to visual tasks), or *broad auditory percention* (same as before, but with auditory tasks). This is interpreted as someone with a high *g* having good *broad auditory and visual perceptions*, and *g* sinthetically explaining the behaviour of the factors and variables "contained" within itself.  
+
+This technique is applied here to the given data set.
+
+```{r data_factanal, include=FALSE, echo=FALSE}
+#EL VALOR MÁS BAJO ACEPTADO ES DE 0.07
+#Extraer los loadings de 210 features. No nombraremos las nuevas features por la complejidad de ello.
+data_factanal <- factanal(data_df_predictors, factors = data_optimal_exfeat, scores = "Bartlett", lower = 0.07)
+#Utilizar esos loadings para transponer la nueva matriz de factores
+data_factanal_exfeat <- data_df_predictors %*% data_factanal$loadings
+
+#Generar los sets de training y test
+data_factanal_train <- subset(data_factanal_exfeat[data_train_index,])
+data_factanal_test <- subset(data_factanal_exfeat[-data_train_index,])
+
+#Ajustar un SVM con esos factores
+data_factanal_svm <- svm(data_factanal_train, y = data_df_train_responses, type = "C-classification", kernel = "radial")
+#Predecir con el modelo ajustado las respuestas
+data_factanal_predict <- stats::predict(data_factanal_svm, data_factanal_test)
+#Tabular datos y sacar Kappa de Cohen
+data_factanal_table <- table(data_df_test_responses, data_factanal_predict)
+data_factanal_perc_table <- prop.table(data_factanal_table)*100
+data_factanal_perc_hit <- sum(diag(data_factanal_perc_table))
+data_factanal_cohen <- cohen.kappa(data_factanal_table)
+```
+
+The data set, previously scaled and balanced via a *SMOTE* function, is fitted to a **Factor Analysis** workflow. The optimal amount of extracted features is retained, and the resulting, transformed data set, is subset into training and test sets. They're are then used to train an **SVM** C-clasiffication type protocol, and predict the test classes.
+
+After fitting and predicting, the  hit and hit percentage values are extracted and represented in **Table 9** and **Table 10**, in absolute and percentage values, respectively.  
+
+```{r data_factanal_table, echo=FALSE, results='asis'}
+kable(data_factanal_table, caption = 'Factor Analysis observed (vertical) versus predicted (horizontal) results', digits = 2, format = "latex")
+```
+```{r data_factanal_perc_table, echo=FALSE, results='asis'}
+kable(data_factanal_perc_table, caption = 'Factor Analysis observed (vertical) versus predicted (horizontal) results - percentages', digits = 2, format = "latex")
+```
+
+This technique gives a weighted Cohen's Kappa Value of `r round(data_factanal_cohen$weighted, 2)`. This value is surprising, given that it puts the **Factor Analysis** technique's accuracy over the **PCA**, which is a peculiar result. This can be a specific case in which **Factor Analysis** is better in a metric sense, while it is clearly more costly in processing power.  
+
+As a visual, informative measure, it is interesting to have the **Factor Analysis** output fitted components plotted, coloured by *tipoCelula* label.  
+
+```{r data_factanal_autoplot, echo=FALSE, results='asis'}
+#autoplot(data_factanal, data = data_df, colour = 'tipoCelula')
+```
+
+All this said, what **Factor Analysis** does (and what makes it unique) is create a matrix of loadings, this is, it creates columns with synthetic factors that "rely" on and group up subsets of the original variables. These new features are semantic groupings of the original variables, giving this technique an added value as it reveals hidden relations between variables.  
+
+Given these new relationships, it is up to the analyst to name them in a semantically comprising manner (let it be said, as an example, that two theoretical variables "speed" and "agility" were revealed to be bound; the wrapping extracted feature could be named, maybe, "mobility"). In this project these complex relationships won't be named, but given more time, the traits that bind these variables together could be analysed and these new features named.   
+
+###5.3.4 - LDA  
+
+**LDA** is a generalization of *Fisher's Linear Discriminant* widely used for dimension reduction and feature extraction. Here it will be used to find a linear combination of features able to classify the data set's entries into its correct class.
+
+This technique is applied here.  
+
+```{r data_lda, include=FALSE, echo=FALSE}
+#Pasar por un LDA los predictores
+data_lda <- lda(data_df_predictors, grouping = data_df_responses)
+
+#Transformar con los discriminantes lineales el set de predictores.
+data_lda_predictors_trans <- data_df_predictors %*% data_lda$scaling
+
+#Generar los sets de training y test
+data_lda_train <- subset(data_lda_predictors_trans[data_train_index,])
+data_lda_test <- subset(data_lda_predictors_trans[-data_train_index,])
+
+#Ajustar un SVM con esos factores
+data_lda_svm <- svm(data_lda_train, y = data_df_train_responses, type = "C-classification", kernel = "radial")
+#Predecir con el modelo ajustado las respuestas
+data_lda_predict <- stats::predict(data_lda_svm, data_lda_test)
+#Tabular datos y sacar Kappa de Cohen
+data_lda_table <- table(data_df_test_responses, data_lda_predict)
+data_lda_perc_table <- prop.table(data_lda_table)*100
+data_lda_perc_hit <- sum(diag(data_lda_perc_table))
+data_lda_cohen <- cohen.kappa(data_lda_table)
+```
+
+The data set, previously scaled and balanced via a *SMOTE* function, is fitted to a **Linear Discriminant Analysis** function. **LDA**, by nature, won't be able to return the same number of components as the other techniques, so as an exception, this protocol will return **two** extracted features, and the resulting, transformed data set, will continue the protocol as standard and be subset into training and test sets. They're are then used to train an **SVM** C-clasiffication type protocol, and predict the test classes.
+
+After fitting and predicting, the  hit and hit percentage values are extracted and represented in **Table 11** and **Table 12**, in absolute and percentage values, respectively.  
+
+```{r data_lda_table, echo=FALSE, results='asis'}
+kable(data_lda_table, caption = 'LDA observed (vertical) versus predicted (horizontal) results', digits = 2, format = "latex")
+```
+```{r data_lda_perc_table, echo=FALSE, results='asis'}
+kable(data_lda_perc_table, caption = 'LDA observed (vertical) versus predicted (horizontal) results - percentages', digits = 2, format = "latex")
+```
+
+This technique gives a weighted Cohen's Kappa Value of `r round(data_lda_cohen$weighted, 2)`. It seems a high value is extracted from a data set with well defined class groupings and it may be that, for this application specifically, **LDA** is a good feature reduction technique.  
+
+##5.4 - Dimension Reduction Techniques - Python  
+
+During coding, it was discovered that even in a streamlined coding and editing environment like **R Markdown** and **Knitr**, where chunks of different programming languages can be concatenated and run in the same script and then rendered into a TeX-PDF document, Python variables and objects don't persist between chunks.  
+
+For this reason, data had to be loaded and preprocessed for every technique. Where necessary, a randomizer seed (123) was used, as to make results replicable.  
+
+*Cohen's Kappa* and Confusion Matrices were extracted via **R** functions. This was done to streamline the process, via extraction of observed and predicted labels to secondary files and using them as input for the **R** functions.
+
+The implementations of each of them are undertaken in this section.  
+
+###5.4.1 - PCA  
+
+**PCA** in **Python** is undertaken via **Scikit-learn**, a **Python** module built on **Numpy**, **Scipy** and **Matplotlib** for machine learning tasks. As in **R**, the basic function for **PCA** is of a basic simplicity.  
+
+The data set is scaled and centered, then over-sampled via **imblearn**'s implementation of the *SMOTE()* function, subset into training and test sets via a randomizing splitter function (*train_test_split()*, from **sklearn.model_selection**), and then reduced via **PCA**. It is subsequently used for **SVM** training and testing.
+
+For this project, 210 of the features extracted by **PCA** are retained and used in the fitting, training and prediction of classes, in order to replicate **R** parameters where possible. The following section depicts the results of this protocol.  
+
+```{python data_1, echo=FALSE, warning = FALSE, message = FALSE, results = 'asis'}
+import scipy
+import numpy
+import pandas as pd
+import matplotlib
+matplotlib.use('agg',warn=False, force=True)
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+from sklearn import svm
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import cohen_kappa_score
+from sklearn.metrics import confusion_matrix
+from imblearn.over_sampling import SMOTE
+from sklearn.preprocessing import scale
+
+data_pydf_predictor_ids = range(7,2874)
+
+data_pydf_predictors = pd.read_csv('data/data.csv', usecols=data_pydf_predictor_ids)
+data_pydf_predictors = data_pydf_predictors.values
+
+#Escalar y centrar
+data_pydf_predictors = scale(data_pydf_predictors)
+
+data_pydf_responses = pd.read_csv('data/data.csv', usecols=['tipoCelula'])
+data_pydf_responses = data_pydf_responses.values
+
+#Aplicar SMOTE a predictores y respuestas
+data_pydf_predictors, data_pydf_responses = SMOTE().fit_sample(data_pydf_predictors, data_pydf_responses.ravel())
+
+#Configurar modelo PCA
+data_pca_py = PCA(n_components=210,copy=True)
+
+#Ajustar PCA con predictores
+data_pca_py_fit = data_pca_py.fit(data_pydf_predictors, data_pydf_responses.ravel())
+
+#Transformar el df de predictores con los 210 componentes principales
+data_pca_py_transf = data_pca_py_fit.transform(data_pydf_predictors)
+
+#Hacer subset de predictores transformados de training y de test
+data_pca_predictors_train, data_pca_predictors_test, data_pca_responses_train, data_pca_responses_test = train_test_split(data_pca_py_transf, data_pydf_responses, train_size = 0.66, test_size = 0.34, random_state=123)
+
+#Aplicar SVM
+data_pca_py_svm = svm.SVC(kernel='rbf')
+
+#Ajustar SVM
+data_pca_py_svm_fit = data_pca_py_svm.fit(data_pca_predictors_train, data_pca_responses_train.ravel()).predict(data_pca_predictors_test)
+
+#Sacar valores esperados y observados a ficheros temporales
+numpy.savetxt('data_pca_responses_test_1D.csv', data_pca_responses_test, delimiter=",", fmt="%s")
+     
+numpy.savetxt('data_pca_py_svm_fit.csv', data_pca_py_svm_fit, delimiter=",", fmt="%s")
+
+```
+```{r results_1, echo=FALSE, warning = FALSE, message = FALSE, results = 'asis'}
+require(knitr)
+require(psych)
+data_pca_responses_test_1D <- read.csv(file = 'data_pca_responses_test_1D.csv', sep = ',', header = FALSE)
+data_pca_responses_test_1D <- data_pca_responses_test_1D[,1]
+
+data_pca_py_svm_fit <- read.csv(file = 'data_pca_py_svm_fit.csv', sep = ',', header = FALSE)
+data_pca_py_svm_fit <- data_pca_py_svm_fit[,1]
+
+#Tabular y sacar la Kappa de Cohen
+data_pca_py_table <- table(data_pca_responses_test_1D, data_pca_py_svm_fit)
+data_pca_py_perc_table <- prop.table(data_pca_py_table)*100
+data_pca_py_perc_hit <- sum(diag(data_pca_py_perc_table))
+data_pca_py_cohen <- cohen.kappa(data_pca_py_table, n.obs = length(data_pca_responses_test_1D))
+```
+```{r results_table_1, echo=FALSE, results='asis'}
+kable(data_pca_py_table, caption = 'PCA observed (vertical) versus predicted (horizontal) results', digits = 2, format = "latex")
+```
+```{r results_perc_table_1, echo=FALSE, results='asis'}
+kable(data_pca_py_perc_table, caption = 'PCA observed (vertical) versus predicted (horizontal) results - percentages', digits = 2, format = "latex")
+```
+
+After fitting and predicting, hit and hit percentage values are extracted and represented in **Table 13** and **Table 14**. It must be noted that the overall process of **PCA** in **Python** is faster than in **R**, and yields a *Cohen's Kappa* value of `r data_pca_py_cohen$weighted`.  
+
+###5.4.2 - ICA  
+
+**ICA** in **Python** is undertaken via **Scikit-learn** too. It doesn't need to be overly parameterized in order to run a basic **ICA** protocol.  
+
+The data set is scaled and centered, then over-sampled via **imblearn**'s implementation of the *SMOTE()* function, subset into training and test sets via a randomizing splitter function (*train_test_split()*, from **sklearn.model_selection**), and then reduced via **ICA**. It is subsequently used for **SVM** training and testing.
+
+For this project, 210 of the features extracted by **ICA** are retained and used in the fitting, training and prediction of classes, in order to replicate **R** parameters where possible. Also with this goal in  mind, tolerance and maximum iterations before convergence were adjusted to mimic the **R** defaults (tolerance: 0.000001 and maximum iterations: 100). The following section depicts the results of this protocol.  
+
+Applying it to the current data set, the results are as follows:  
+
+```{python data_2, echo=FALSE, warning = FALSE, message = FALSE, results = 'asis'}
+import scipy
+import numpy
+import pandas as pd
+from sklearn.decomposition import FastICA
+from sklearn import svm
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import cohen_kappa_score
+from sklearn.metrics import confusion_matrix
+from imblearn.over_sampling import SMOTE
+from sklearn.preprocessing import scale
+
+data_pydf_predictor_ids = range(7,2874)
+
+data_pydf_predictors = pd.read_csv('data/data.csv', usecols=data_pydf_predictor_ids)
+data_pydf_predictors = data_pydf_predictors.values
+
+#Escalar y centrar
+data_pydf_predictors = scale(data_pydf_predictors)
+
+data_pydf_responses = pd.read_csv('data/data.csv', usecols=['tipoCelula'])
+data_pydf_responses = data_pydf_responses.values
+
+#Aplicar SMOTE a predictores y respuestas
+data_pydf_predictors, data_pydf_responses = SMOTE().fit_sample(data_pydf_predictors, data_pydf_responses.ravel())
+
+#Configurar modelo ICA
+data_ica_py = FastICA(n_components=210, tol=0.000001, max_iter = 100)
+
+#Ajustar ICA con predictores
+data_ica_py_fit = data_ica_py.fit(data_pydf_predictors, data_pydf_responses.ravel())
+
+#Transformar el df de predictores con los 20 componentes principales
+data_ica_py_transf = data_ica_py_fit.transform(data_pydf_predictors)
+
+#Hacer subset de predictores transformados de training y de test
+data_ica_predictors_train, data_ica_predictors_test, data_ica_responses_train, data_ica_responses_test = train_test_split(data_ica_py_transf, data_pydf_responses, train_size = 0.66, test_size = 0.34, random_state=123)
+
+#Aplicar SVM
+data_ica_py_svm = svm.SVC(kernel='rbf')
+
+#Ajustar SVM
+data_ica_py_svm_fit = data_ica_py_svm.fit(data_ica_predictors_train, data_ica_responses_train.ravel()).predict(data_ica_predictors_test)
+
+#Sacar valores esperados y observados a ficheros temporales
+numpy.savetxt("data_ica_responses_test_1D.csv", data_ica_responses_test, delimiter=",", fmt="%s")
+     
+numpy.savetxt("data_ica_py_svm_fit.csv", data_ica_py_svm_fit, delimiter=",", fmt="%s")
+
+```
+```{r results_2, echo=FALSE, warning = FALSE, message = FALSE, results = 'asis'}
+data_ica_responses_test_1D <- read.csv(file = 'data_ica_responses_test_1D.csv', sep = ',', header = FALSE)
+data_ica_responses_test_1D <- data_ica_responses_test_1D[,1]
+
+data_ica_py_svm_fit <- read.csv(file = 'data_ica_py_svm_fit.csv', sep = ',', header = FALSE)
+data_ica_py_svm_fit <- data_ica_py_svm_fit[,1]
+
+#Tabular y sacar la Kappa de Cohen
+data_ica_py_table <- table(data_ica_responses_test_1D, data_ica_py_svm_fit)
+data_ica_py_perc_table <- prop.table(data_ica_py_table)*100
+data_ica_py_perc_hit <- sum(diag(data_ica_py_perc_table))
+#data_ica_py_cohen <- cohen.kappa(data_ica_py_table, n.obs = length(data_ica_responses_test_1D))
+```
+```{r results_table_2, echo=FALSE, results='asis'}
+kable(data_ica_py_table, caption = 'ICA observed (vertical) versus predicted (horizontal) results', digits = 2, format = "latex")
+```
+```{r results_perc_table_2, echo=FALSE, results='asis'}
+kable(data_ica_py_perc_table, caption = 'ICA observed (vertical) versus predicted (horizontal) results - percentages', digits = 2, format = "latex")
+```
+
+Hit and hit percentage values, although invalid for comparison, are nevertheless extracted and represented in **Table 15** and **Table 16**.
+
+It is discovered that the predicted values all yield an **ATYPICAL_LYMPHOCYTE** result. This is due to the fact that if tuned with the samedefault parameters as its **R** analogue, **Python's FastICA** doesn't even get to convergence, apart from taking a lot of processing time; still, it provides an interesting result: this technique's *Cohen's Kappa* is **zero**, which is remarkable. In the observed test labels the **ATYPICAL_LYMPHOCYTE** result is registered a majority of times, which, if only raw accuracy was used as metric, would yield a high random hit rate. Instead, *Cohen's Kappa* takes into account the probability of this one being the result, which in the predicted values is of a 100%, and lowers the expected validity of such a prediction from the high random accuracy potential yield to a round zero. Even though the raw **ICA**-constructed prediction is of an underwhelming precision, the solidity of *Cohen's Kappa* as a metric is supported by this occurrence.  
+
+###5.4.3 - Factor Analysis  
+
+**Factor Analysis** in **Python** is undertaken via **Scikit-learn**'s function *FactorAnalysis()*, using as parameter the number of features to be extracted.   
+
+The data set is scaled and centered, then over-sampled via **imblearn**'s implementation of the *SMOTE()* function, reduced via **Factor Analysis**, and then subset into training and test sets via a randomizing splitter function (*train_test_split()*, from **sklearn.model_selection**). It is subsequently used for **SVM** training and testing.
+
+For this project, 210 of the features extracted by **Factor Analysis** are retained and used in the fitting, training and prediction of classes, in order to replicate **R** parameters where possible. The following section depicts the results of this protocol.  
+
+This technique is applied here to the given data set.
+
+```{python data_3, echo=FALSE, warning = FALSE, message = FALSE, results = 'asis'}
+import scipy
+import numpy
+import pandas as pd
+from sklearn.decomposition import FactorAnalysis
+from sklearn import svm
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import cohen_kappa_score
+from sklearn.metrics import confusion_matrix
+import matplotlib
+from imblearn.over_sampling import SMOTE
+from sklearn.preprocessing import scale
+
+data_pydf_predictor_ids = range(7,2874)
+
+data_pydf_predictors = pd.read_csv('data/data.csv', usecols=data_pydf_predictor_ids)
+data_pydf_predictors = data_pydf_predictors.values
+
+#Escalar y centrar
+data_pydf_predictors = scale(data_pydf_predictors)
+
+data_pydf_responses = pd.read_csv('data/data.csv', usecols=['tipoCelula'])
+data_pydf_responses = data_pydf_responses.values
+
+#Aplicar SMOTE a predictores y respuestas
+data_pydf_predictors, data_pydf_responses = SMOTE().fit_sample(data_pydf_predictors, data_pydf_responses.ravel())
+
+#Configurar Factor Analysis
+data_factanal_py = FactorAnalysis(n_components=210)
+
+#Ajustar Factor Analysis con predictores y respuestas
+data_factanal_py_fit = data_factanal_py.fit(data_pydf_predictors, data_pydf_responses.ravel())
+
+#Transformar el df de predictores con los 210 componentes principales
+data_factanal_py_transf = data_factanal_py_fit.transform(data_pydf_predictors)
+
+#Hacer subset de predictores transformados de training y de test
+data_factanal_predictors_train, data_factanal_predictors_test, data_factanal_responses_train, data_factanal_responses_test = train_test_split(data_factanal_py_transf, data_pydf_responses, train_size = 0.66, test_size = 0.34, random_state=123)
+
+#Aplicar SVM
+data_factanal_py_svm = svm.SVC(kernel='rbf')
+
+#Ajustar SVM
+data_factanal_py_svm_fit = data_factanal_py_svm.fit(data_factanal_predictors_train, data_factanal_responses_train.ravel()).predict(data_factanal_predictors_test)
+
+#Sacar valores esperados y observados a ficheros temporales
+numpy.savetxt("data_factanal_responses_test_1D.csv", data_factanal_responses_test, delimiter=",", fmt="%s")
+     
+numpy.savetxt("data_factanal_py_svm_fit.csv", data_factanal_py_svm_fit, delimiter=",", fmt="%s")
+
+```
+```{r results_3, echo=FALSE, warning = FALSE, message = FALSE, results = 'asis'}
+data_factanal_responses_test_1D <- read.csv(file = 'data_factanal_responses_test_1D.csv', sep = ',', header = FALSE)
+data_factanal_responses_test_1D <- data_factanal_responses_test_1D[,1]
+
+data_factanal_py_svm_fit <- read.csv(file = 'data_factanal_py_svm_fit.csv', sep = ',', header = FALSE)
+data_factanal_py_svm_fit <- data_factanal_py_svm_fit[,1]
+
+#Tabular y sacar la Kappa de Cohen
+data_factanal_py_table <- table(data_factanal_responses_test_1D, data_factanal_py_svm_fit)
+data_factanal_py_perc_table <- prop.table(data_factanal_py_table)*100
+data_factanal_py_perc_hit <- sum(diag(data_factanal_py_perc_table))
+data_factanal_py_cohen <- cohen.kappa(data_factanal_py_table, n.obs = length(data_factanal_responses_test_1D))
+```
+```{r results_table_3, echo=FALSE, results='asis'}
+kable(data_factanal_py_table, caption = 'Factor Analysis observed (vertical) versus predicted (horizontal) results', digits = 2, format = "latex")
+```
+```{r results_perc_table_3, echo=FALSE, results='asis'}
+kable(data_factanal_py_perc_table, caption = 'Factor Analysis observed (vertical) versus predicted (horizontal) results - percentages', digits = 2, format = "latex")
+```
+
+After fitting and predicting, hit and hit percentage values are extracted and represented in **Table 17** and **Table 18**. The confusion matrix and *Cohen's Kappa* score show a definite improvement over **PCA** and **ICA**.  
+
+This technique gives a weighted Cohen's Kappa Value of `r round(data_factanal_py_cohen$weighted,2)`. This value is higher than that given by **PCA**, in some degree of accordance to the **R** results, in which, surprisingly, **Factor Analysis** ended up giving a better prediction accuracy than both **PCA** and **ICA**.     
+
+###5.4.4 - LDA  
+
+**LDA** in **Python** is undertaken via **Scikit-learn**'s function *FactorAnalysis()*, from the submodule *discriminant_analysis*, using as parameter the number of features to be extracted.   
+
+The data set is scaled and centered, then over-sampled via **imblearn**'s implementation of the *SMOTE()* function, reduced via **Linear Discriminant Analysis**, and then subset into training and test sets via a randomizing splitter function (*train_test_split()*, from **sklearn.model_selection**). It is subsequently used for **SVM** training and testing.
+
+For this project, 210 of the features extracted by **LDA** are retained and used in the fitting, training and prediction of classes, in order to replicate **R** parameters where possible. The following section depicts the results of this protocol.  
+
+This technique is applied here to the given data set.  
+
+```{python data_4, echo=FALSE, warning = FALSE, message = FALSE, results = 'asis'}
+import scipy
+import numpy
+import pandas as pd
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn import svm
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import cohen_kappa_score
+from sklearn.metrics import confusion_matrix
+from imblearn.over_sampling import SMOTE
+from sklearn.preprocessing import scale
+
+data_pydf_predictor_ids = range(7,2874)
+
+data_pydf_predictors = pd.read_csv('data/data.csv', usecols=data_pydf_predictor_ids)
+data_pydf_predictors = data_pydf_predictors.values
+
+#Escalar y centrar
+data_pydf_predictors = scale(data_pydf_predictors)
+
+data_pydf_responses = pd.read_csv('data/data.csv', usecols=['tipoCelula'])
+data_pydf_responses = data_pydf_responses.values
+
+#Aplicar SMOTE a predictores y respuestas
+data_pydf_predictors, data_pydf_responses = SMOTE().fit_sample(data_pydf_predictors, data_pydf_responses.ravel())
+
+#Configurar modelo ICA
+data_lda_py = LinearDiscriminantAnalysis(n_components=210)
+
+#Ajustar ICA con predictores y respuestas
+data_lda_py_fit = data_lda_py.fit(data_pydf_predictors, data_pydf_responses.ravel())
+
+#Transformar el df de predictores con los 210 componentes principales
+data_lda_py_transf = data_lda_py_fit.transform(data_pydf_predictors)
+
+#Hacer subset de predictores transformados de training y de test
+data_lda_predictors_train, data_lda_predictors_test, data_lda_responses_train, data_lda_responses_test = train_test_split(data_lda_py_transf, data_pydf_responses, train_size = 0.66, test_size = 0.34, random_state=123)
+
+#Aplicar SVM
+data_lda_py_svm = svm.SVC(kernel='rbf')
+
+#Ajustar SVM
+data_lda_py_svm_fit = data_lda_py_svm.fit(data_lda_predictors_train, data_lda_responses_train.ravel()).predict(data_lda_predictors_test)
+
+#Sacar valores esperados y observados a ficheros temporales
+numpy.savetxt("data_lda_responses_test_1D.csv", data_lda_responses_test, delimiter=",", fmt="%s")
+     
+numpy.savetxt("data_lda_py_svm_fit.csv", data_lda_py_svm_fit, delimiter=",", fmt="%s")
+
+```
+```{r results_4, echo=FALSE, warning = FALSE, message = FALSE, results = 'asis'}
+data_lda_responses_test_1D <- read.csv(file = 'data_lda_responses_test_1D.csv', sep = ',', header = FALSE)
+data_lda_responses_test_1D <- data_lda_responses_test_1D[,1]
+
+data_lda_py_svm_fit <- read.csv(file = 'data_lda_py_svm_fit.csv', sep = ',', header = FALSE)
+data_lda_py_svm_fit <- data_lda_py_svm_fit[,1]
+
+#Tabular y sacar la Kappa de Cohen
+data_lda_py_table <- table(data_lda_responses_test_1D, data_lda_py_svm_fit)
+data_lda_py_perc_table <- prop.table(data_lda_py_table)*100
+data_lda_py_perc_hit <- sum(diag(data_lda_py_perc_table))
+data_lda_py_cohen <- cohen.kappa(data_lda_py_table, n.obs = length(data_lda_responses_test_1D))
+```
+
+```{r results_table_4, echo=FALSE, results='asis'}
+kable(data_lda_py_table, caption = 'LDA observed (vertical) versus predicted (horizontal) results', digits = 2, format = "latex")
+```
+
+```{r results_perc_table_4, echo=FALSE, results='asis'}
+kable(data_lda_py_perc_table, caption = 'LDA observed (vertical) versus predicted (horizontal) results - percentages', digits = 2, format = "latex")
+```
+
+After fitting and predicting, hit and hit percentage values are extracted and represented in **Table 19** and **Table 20**. **LDA** in **Python** yields a high *Cohen's Kappa* score, `r round(data_lda_py_cohen$weighted, 2)`, in accordance to the results from the **R** implementation of this technique. The fact that in both languages the best-ranking technique is **LDA** is significant.  
+
+##5.5 - Missing techniques  
+
+Two more techniques have been mentioned in this project that didn't make the final cut to this report. These are **T-Stochastic Neighbor Embeddinh** and **Stacked Denoising Autoencoders**. The reasons why have been explained in the partial reports for this project, and are as follows:  
+
+**T-Stochastic Neighbor Embedding**: This visualization technique, even although it produces a kind of dimension reduction, has been dropped mainly for two resons, being these its performance and its function. Its function, in the end, was more of a visualization tool, which finally didn't fit this project's interest spectrum. Its performance, on the other hand, and at least for this kind of data, was appaling, having exhausted during trials both the resources of an **HP Proliant Gen8** upgraded microserver and a **c3.2xlarge** EC server from **Amazon Web Services**. In both cases, the workflow didn't even get to a significant point before running out of virtual memory.  
+
+For the purposes of this project, this is considered as a result in and of itself for this technique.  
+
+**Stacked Denoising Autoencoders**: This dimension reduction technique, being especially constructed with digital image reconstruction in mind, didn't finally fit the goals of this project. As an input, this technique uses boolean matrices, and the current data set couldn't be coerced to such a data structure without either becoming impracticably complex or losing a significant amount of information in the process.  
+
+This is also considered as a result, even if a negative one.  
+
 #6 - Conclussions  
+
+The values for the Cohen's Kappa for each programming language's technique and a brief commentary for each are presented in **Table 21**, and the following conclussions are extracted.  
+
+```{r result_table, echo=FALSE, results='asis'}
+results_cohen <- c(round(data_pca_cohen$weighted, 2),round(data_ica_cohen$weighted, 2),round(data_factanal_cohen$weighted, 2),round(data_lda_cohen$weighted, 2),round(data_pca_py_cohen$weighted, 2),0,round(data_factanal_py_cohen$weighted, 2),round(data_lda_py_cohen$weighted, 2))
+results_comments <- c('Standard results, benchmark processing time','Processing time slightly higher than PCA','Longest processing time, added value','Equivalent processing time to PCA','Streamlined results, shorter than its R analogue','Unable to reach convergence','Longest processing time, shorter than its R analogue','Shorter processing time than R analogue')
+result_table_colnames <- c('Cohen\'s Kappa','Additional comments')
+result_table_rownames <- c('PCA - R','ICA - R','Factor Analysis - R','LDA - R','PCA - Python','ICA - Python','Factor Analysis - Python','LDA - Python')
+result_table <- data.frame(cbind(results_cohen,results_comments))
+colnames(result_table) <- result_table_colnames
+rownames(result_table) <- result_table_rownames
+kable(result_table, caption = 'Cohen\'s Kappa Values and additional comments by technique', digits = 2, format = "latex")
+```
+
+- That **Python**, in respect to statistics-oriented modules, is a more-streamlined, less flexible language than **R**.
+- That **R** offers more implementations of even obscure or little known protocols and algorithms, and offers better flexibility to tamper with them, if the user is adept at coding.
+- That **PCA** acts as an effective benchmark, being the "golden standard" of widely appliable dimension reduction techniques.  
+- That in **R**, **ICA** produces similar results, while not fine-tuned, to PCA; in **Python**, it requires a tolerance threshold too high to achieve convergence and under-performs compared to **PCA**.  
+- That **Factor Analysis** and **Linear Discriminant Analysis**, for this area of application, generally yield better results than **PCA** or **ICA**.  
+- That, while **Factor Analysis** has a greater processing time, it also yields an additional value: it establishes semantic relationships between features that, in a smaller data set or given more time to analyse them, could reveal new and interesting traits for the original variables or the study cases to which they belong.  
+- That **Linear Discriminant Analysis** gives up the most efficiently reduced dimensional space after the technique, with a surprisingly high *Cohen's Kappa* for a very limited processing time in both programming languages.  
+- That both **T-Stochastic Neighbor Embedding** and **Stacked Denoising Autoencoders** are not valid for the requirements/input this study imposes.  
+- That *Cohen's Kappa* is a valid accuracy metric that not only yields information about hits, but also takes into account the chance of those hits being random.  
+- That preprocessing of the data is important for accuracy of classification: both scaling and centering data sets help improve significance and accuracy of classification.  
+- That class imbalance can be, and in fact is, a problem with data sets, and that balancing observed classes with techniques such as **SMOTE** improves accuracy of classification and avoids statistical artifacts.  
+
+Also, as a last conclussion, this study merits a longer research. As such, milestones along a theoretical future roadmap could include:  
+
+- Implementing a processing objective metric, such as *System.time()* or *tictoc* in **R** or *time()* in Python, and a trial protocol, such that differences in processing time can be objectively measured and cross-tested.
+- A better implementation of Python code, more object-oriented, as to optimise processing.  
+- Cross-testing of different parameter setups, in order to better understand not only the best performers, but the best configurations.  
+- A visualization module or script for both **Python** and **R**. Right now, while **R** offers direct applications of plotting systems for the practical majority of its functions, **Python** requires a lot of tweaking of its modules (mainly *matplotlib*), especially for data sets with so many features, even when reduced to such a number as 210.  
 
 #7 - Glossary  
 
-#8 - Annexes  
+**Dimension reduction**: Process by which the number of random variables under consideration is reduced either by obtaining a set of transformations, combinations of variables or selection of most informative traits.  
+**Feature (statistics)**: Equivalent to variable or attribute.  
+**Gaussianity**: Equivalent to **Normality**.  
+**Normality**: The quality of adjusting to a normal distribution.  
+**Lymphoblast**: Activated form of a lymphocyte with an increased volume and protein-synthesis activity.  
+**Lymphocyte**: White blood cell subtype, part of the immune system, which includes **adaptive** and **innate** immunity cells.  
+**Object-oriented**: Programming paradigm focused on the creation of objects, entities or classes, with a complete semantic body, full with attributes and methods.  
 
-#9 - References  
-
+#8 - References  
