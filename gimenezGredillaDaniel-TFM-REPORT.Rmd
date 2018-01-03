@@ -3,10 +3,12 @@ title: "Comparison of several forms of dimension reduction on cuantitative morph
 author: "Giménez Gredilla, Daniel"
 date: "October 2017"
 bibliography: library.bib
+abstract: 'Dimension reduction, or dimensionality reduction, is the process through which the number of variables observed in a study is reduced to a smaller number. The term *Lymphoma* defines a group of very common white blood cell cancers that affect both adult individuals and children. The correct diagnosis and treatment of lymphoma offers a significant survival rate. The *Curse of Dimensionality* is a common problem in which additional dimensions in data sets make information sparser. This can be managed by dimension reduction techniques. This study aims to compare PCA, ICA, Factor Analysis and LDA\'s performance.  \par La reducción dimensional es el proceso por el que el número de variables observado en un estudio es reducido a una cantidad menor. El término "linfoma" define un grupo de cánceres de glóbulos blancos que afectan tanto a adultos como a niños. El diagnóstico y tratamiento correcto del linfoma ofrece una tasa de supervivencia significativa. La "Maldición de la Dimensionalidad" es un problema común en el que la adición de dimensiones en conjuntos de datos produce una dilución de la información. Esto puede ser evitado mediante técnicas de reducción dimensional. Este estudio se enfoca en la comparación de la eficiencia de PCA, ICA, Análisis de Factores y LDA.  \pagebreak'
 output:
   pdf_document: 
     toc: yes
     toc_depth: 3
+    keep_tex: true
     fig_caption: yes
     includes:  
       in_header: tex-support.tex
@@ -16,18 +18,21 @@ output:
       ]
 options:
   encoding: utf8
+header-includes:
+- \usepackage[fontsize=13pt]{scrextend}
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, engine.path = list(python = 'C:/Program Files (x86)/eMule/python/python.exe'), fig.lp = "Fig. ", tidy.opts=list(width.cutoff=60),tidy=TRUE, cache = TRUE, fig.width=12, fig.height=4, comment = NULL, out.height='200px', dpi=200, fig.pos = 'h', out.extra = '')
 ```
 
-
 ```{r library_load, echo=FALSE, message=FALSE}
 require(knitr)
 require(stats)
 require(caret)
 require(e1071)
+require(reticulate)
+require(devtools)
 require(ica)
 require(psych)
 require(MASS)
@@ -35,6 +40,10 @@ require(ggplot2)
 require(ggfortify)
 require(reshape2)
 require(DMwR)
+```
+
+```{r knitr_python_engine}
+knitr::knit_engines$set(python = 'ipython')
 ```
 
 \pagebreak  
@@ -63,7 +72,7 @@ The next step is feature selection/extraction, in which a group of features is m
 
 The last step is the classification itself. Classification demands for a pattern to be established that can reliably assign a given sample to a given class. There are many machine learning algorithms used to find these patterns, such as *ANN's* or *SVMs*. For the purposes of this project, a focus will be given to *SVMs*.  
 
-*Support Vector Machines* are a machine learning algorithm first introduced by Vladimir Vapnik [@Leslie2002]. They aim to find one or a set of hyperplanes that divide the sample space into categories, as cleanly as possible and with as little interference of samples from one space into another. This or these hyperplanes are then used to classify new test samples into one of the original classe.  
+*Support Vector Machines* are machine learning algorithms first introduced by Vladimir Vapnik [@Leslie2002]. They aim to find one or a set of hyperplanes that divide the sample space into categories, as cleanly as possible and with as little interference of samples from one space into another. This or these hyperplanes are then used to classify new test samples into one of the original classe.  
 
 In a non-ideal, more realistic background, samples won't be always cleanly separated into smooth groups. This situation is managed by searching for a compromise between maximum classification accuracy and a reasonable classification error. Different *kernels* can also be introduced in the *SVM* algorithm in order to improve the classification results.  
 
@@ -107,7 +116,7 @@ The accuracy of a prediction is the proportion of true positives plus true negat
 
 ###1.2.1 - General goals  
 
-The goal of this project is to **compare several techniques of dimension reduction** through the construction of significant features and their respective results given a classification workflow. This classification workflow should differentiate normal, abnormal and reactive lymphoid cells. The resulting accuracy values will serve as scoring for the features constructed, and as such, for the objective assesment of the behaviour of the dimension reduction techniques behind them.  
+The goal of this project is to **compare several techniques of dimension reduction** through the construction of significant features and their respective results given a classification workflow. This classification workflow should differentiate normal, abnormal and variant lymphoid cells. The resulting accuracy values will serve as scoring for the features constructed, and as such, for the objective assesment of the behaviour of the dimension reduction techniques behind them.  
 
 ###1.2.2 - Specific goals  
 
@@ -475,7 +484,7 @@ The final report, due January the $2^{nd}$, with a maximum length of 90 pages, w
 
 ###1.5.3 - Product
 
-In the course of this project, an automated comparison report script will be produced. The code used will be added as an addendum to the final report, along with code comments and protocols of use. The code will be stored in a GitHub repository, available for the public to clone, review and use. GitHub is a version-control platform used to store git repositories, with an emphasis on open-source, collaborative efforts and project versioning. Mendeley will be used as referencing tool, syncronized with R Markup through an embedded *.bib* file.
+In the course of this project, an automated comparison report script will be produced. The code used will be added as an addendum to the final report, along with code comments. The code will be stored in a GitHub repository, available for the public to clone, review and use. GitHub is a version-control platform used to store git repositories, with an emphasis on open-source, collaborative efforts and project versioning. Mendeley will be used as referencing tool, syncronized with R Markup through an embedded *.bib* file.
 
 ###1.5.4 - Virtual presentation
 
@@ -956,7 +965,7 @@ An accuracy metric that can be applied to a multiclass classification is needed 
 
 ##4.3 - Classification Rate  
 
-This metric is described as the number of successful hits relative to the total number of classifications. It's been stated to be the most commonly used metric for assessing the performance of classifiers for years.
+This metric is described as the number of successful hits relative to the total number of classifications. It's been stated to be the most commonly used metric for assessing the performance of classifiers for years.  
 
 ##4.4 - Cohen's Kappa  
 
@@ -966,7 +975,7 @@ $kappa = \frac{n \sum_{i=1}^C x_{ii} - \sum_{i=1}^C x_{i.}x_{.i}}{n^2 - \sum_{i=
 
 Where $x_{ii}$ is the cell count in the main diagonal, *n* is the number of examples, *C* is the number of class values and $x_{.i}x_{i.}$ are the total columns and rows counts, respectively.  
 
-The value range of **Cohen's Kappa** goes from -1 (total disagreement) to 1 (perfect agreement).
+The value range of **Cohen's Kappa** goes from -1 (total disagreement) to 1 (perfect agreement).  
 
 ##4.5 - Chosen scoring metric  
 
@@ -977,7 +986,7 @@ For this project, the chosen accuracy metric is **Cohen's Kappa**. The reasons a
 - **Cohen's Kappa** yields a scalar, simple value well suited for multiclass classification.  
 - It is more powerful than **Classification Rate**, because it takes into account random hits, scoring successes separately for each class and aggregating them.  
 
-For these reasons, the scoring metric to be applied in this project is **Cohen's Kappa**.
+For these reasons, the scoring metric to be applied in this project is **Cohen's Kappa**.  
 
 #5 - Comparison methods and protocols  
 
@@ -1024,13 +1033,13 @@ The current data set has `r length(data_df[,1])` observations for `r length(data
 
 The response variable, *tipoCelula*, has three levels, being these **ATYPICAL_LYMPHOCYTE**, **VARIANT_LYMPHOCYTE** and **LYMPHOCYTE**. Two subsets will be generated with this data, a training set comprising 66% of all data, and a test set formed by the remaining entries. Both sets are generated by defining a random seed with the *set.seed()* function (the seed beeing 123) and applying that seed, either to the *sample()* function in R, or to the *train_test_split()* function in **Python** to generate, respectively, either an array of indexes or the training-test subsets themselves.  
 
-###5.1.2 - Class imbalance problem
+###5.1.2 - Class imbalance problem  
 
 While dyagnosing the data set, a single look at the response classes is enough to find a pronounced imbalance in the number of observed classes. There is an important proportion of **atypical** lymphocytes, in respect to the **variant** and **normal** lymphocytes. Such imbalance can create an artifact of classification. In this case, this artifact would be less costly, as it would skew towards an excessive zeal when classifying **atyipical** lymphocytes, but still, it's a source of noise that should be avoided when possible.  
 
 Highly imbalanced datasets bring with them the problem of **random accuracy**. If a data set, such as the one being assessed in this project, has, let it be said 75% of samples in one class, there's an initial chance that by pure, random luck, predicting all test samples as belonging to that class will yield a 75% accuracy score.  
 
-There are several class balancing techniques designed to avoid this artifact. As stated in [@Barandela2004], basic methods for reducing class imbalance can be sorted in three groups:
+There are several class balancing techniques designed to avoid this artifact. As stated in [@Barandela2004], basic methods for reducing class imbalance can be sorted in three groups:  
 
 - Over-sampling, which aims to replicate samples in the minority group to artificially augment its representation.  
 - Under-sampling, which serves the opposite goal, to cut samples from the majority group.  
@@ -1042,15 +1051,15 @@ Also, there is a hybrid approach, which relies on both over- and under-sampling 
 
 **SMOTE** (*Synthetic Minority Oversampling Technique*) [@Ramentol2012] is a data-level balancing approach, in opposition to learning-algorithm approaches. These are said to be more versatile, as its use is independent of the protocol followed and can then be used to train any classifier.  
 
-The **SMOTE** algorithm oversamples the minority class by introducing synthetic minority class examples along the line segments that join the *k* nearest neighbors. What it does is take each of these *k* nearest neighbors, randomly chosen, and substract it from the sample in question. Then multiply the difference by a random value between 0 and 1, and add this point as a new minority class example.
+The **SMOTE** algorithm oversamples the minority class by introducing synthetic minority class examples along the line segments that join the *k* nearest neighbors. What it does is take each of these *k* nearest neighbors, randomly chosen, and substract it from the sample in question. Then multiply the difference by a random value between 0 and 1, and add this point as a new minority class example.  
 
-Even though **SMOTE** itself is an over-sampling method, it is implemente as a hybrid approach by **R** in the *SMOTE()* function, from the **DMwR** package. This function, which will be used for this dataset, under- and over-samples the data set, with parameters allowing to put focus on one or both. For this project, given the aim to over-sample the minority class, focus will by put on this by setting the *perc.over* parameter to 200.
+Even though **SMOTE** itself is an over-sampling method, it is implemente as a hybrid approach by **R** in the *SMOTE()* function, from the **DMwR** package. This function, which will be used for this dataset, under- and over-samples the data set, with parameters allowing to put focus on one or both. For this project, given the aim to over-sample the minority class, focus will by put on this by setting the *perc.over* parameter to 200.  
 
 ##5.2 - Goals and techniques  
 
 This script aims to assess the comparative performances of different dimension reduction techniques. They will be measured for a common accuracy metric and judged by their processing performance. Being **PCA** the most used, most assessed technique, it will be used as a kind of touchstone in respect to requirements for the other techniques in **R**. This techniques will then be replicated in their **Python** implementations keeping, as much as possible, all parameters as a measure of objectivity between both languages.  
 
-Other optional parameters, where possible, will be kept to a minimum. The reason for this is to assess the validity of techniques out of fine-tuning, in their most raw conditions, as fine-tuning each of them would be a matter for a latter study.
+Other optional parameters, where possible, will be kept to a minimum. The reason for this is to assess the validity of techniques out of fine-tuning, in their most raw conditions, as fine-tuning each of them would be a matter for a latter study.  
 
 For the effects of this project, the benchmark minimum number of extracted features is that which satisfies one condition, being this that these extracted features account for an accumulated 95% of variance in the reference dimensionality reduction technique, **PCA**. Having determined this, a continued test of cumulative numbers of extracted features, between a floor of 10 and an estimative limit of 250 yields the following result.  
 
@@ -1068,6 +1077,12 @@ for (i in seq(from = 10, to = 250, by = 10)) {
     return(varImpMessage)
   }
 }
+```
+
+With a single plot of the variance explained by the first *PC*'s the fact that the most variance is mainly explained by the most influential *PC*'s is clearly visible:  
+
+```{r data_pca_plot_vars, echo=FALSE, results='asis'}
+plot(data_pca,type="lines", main = 'Variance explained', sub = 'Only the most influential PC\'s represented')
 ```
 
 ```{r data_exfeat_message, include = FALSE, results='asis'}
@@ -1089,7 +1104,7 @@ $kappa = \frac{n \sum_{i=1}^C x_{ii} - \sum_{i=1}^C x_{i.}x_{.i}}{n^2 - \sum_{i=
 
 Where $x_{ii}$ is the cell count in the main diagonal, *n* is the number of examples, *C* is the number of class values and $x_{.i}x_{i.}$ are the total columns and rows counts, respectively.  
 
-The value range of **Cohen's Kappa** goes from -1 (total disagreement) to 1 (perfect agreement).
+The value range of **Cohen's Kappa** goes from -1 (total disagreement) to 1 (perfect agreement).  
 
 The reasons for chosing **Cohen's Kappa** as accuracy metric are as follows:  
 
@@ -1125,7 +1140,7 @@ data_pca_perc_hit <- sum(diag(data_pca_perc_table))
 data_pca_cohen <- cohen.kappa(data_pca_table, n.obs = length(data_df_test_responses))
 ```
 
-The data set, previously scaled and balanced via a *SMOTE* function, is fitted to a **PCA**. The optimal amount of PC's (*Principal Components*) is retained, and the resulting, transformed data set, is subset into training and test sets. They're are then used to train an **SVM** C-clasiffication type protocol, and predict the test classes.
+The data set, previously scaled and balanced via a *SMOTE* function, is fitted to a **PCA**. The optimal amount of PC's (*Principal Components*) is retained, and the resulting, transformed data set, is subset into training and test sets. They're are then used to train an **SVM** C-clasiffication type protocol, and predict the test classes.  
 
 After fitting and predicting, the  hit and hit percentage values are extracted and represented in **Table 5** and **Table 6**, in absolute and percentage values, respectively.  
 
@@ -1137,15 +1152,17 @@ kable(data_pca_table, caption = 'PCA observed (vertical) versus predicted (horiz
 kable(data_pca_perc_table, caption = 'PCA observed (vertical) versus predicted (horizontal) results - percentages', digits = 2, format = "latex")
 ```
 
-**PCA** yields a weighted Cohen's Kappa value of `r round(data_pca_cohen$weighted, 2)`, which will be a benchmark for other techniques.
+**PCA** yields a weighted Cohen's Kappa value of `r round(data_pca_cohen$weighted, 2)`, which will be a benchmark for other techniques.  
 
-As a visual, informative measure, it is interesting to have the pca fitted components plotted, coloured by *tipoCelula* label.  
+As a visual, informative measure, it is interesting to have the pca fitted components plotted, coloured by *tipoCelula* label. With other, less dimensional examples, plotting **PCA** would be more informative, as a small number of *PC*'s would be plottable in a few graphs without too much cluttering, something that doesn't happen with the 210 components extracted in this study. Even so, the points transformed to the 2 main PC's are plotted here, and their centroid is pointed in red.  
 
 ```{r data_pca_autoplot, echo=FALSE, results='asis'}
-#autoplot(data_pca, data = data_df, colour = 'tipoCelula')
+cnt1 <- mean(data_pca$x[,1])
+cnt2 <- mean(data_pca$x[,2])
+autoplot(data_pca, data = data_df_bal, colour = 'tipoCelula') + geom_point(x=cnt1, y=cnt2, colour="red", size=3)
 ```
 
-Points in space are grouped by factors and colored by response label.
+Points in space are grouped by *PC* and colored by response label.  
 
 ###5.3.2 - ICA  
 
@@ -1176,7 +1193,7 @@ data_ica_perc_hit <- sum(diag(data_ica_perc_table))
 data_ica_cohen <- cohen.kappa(data_ica_table, n.obs = length(data_df_test_responses))
 ```
 
-The data set, previously scaled and balanced via a *SMOTE* function, is fitted to a **ICA**. The optimal amount of extracted features is retained, and the resulting, transformed data set, is subset into training and test sets. They're are then used to train an **SVM** C-clasiffication type protocol, and predict the test classes.
+The data set, previously scaled and balanced via a *SMOTE* function, is fitted to a **ICA**. The optimal amount of extracted features is retained, and the resulting, transformed data set, is subset into training and test sets. They're are then used to train an **SVM** C-clasiffication type protocol, and predict the test classes.  
 
 After fitting and predicting, the  hit and hit percentage values are extracted and represented in **Table 7** and **Table 8**, in absolute and percentage values, respectively.  
 
@@ -1188,10 +1205,10 @@ kable(data_ica_table, caption = 'ICA observed (vertical) versus predicted (horiz
 kable(data_ica_perc_table, caption = 'ICA observed (vertical) versus predicted (horizontal) results - percentages', digits = 2, format = "latex")
 ```
 
-Curiously, **ICA** yields results similar to **PCA**, with a weighted Cohen's Kappa of `r round(data_ica_cohen$weighted, 2)`. Even though this puts it at eye level with **PCA**, the processing power needed for this technique is noticeably larger, and thus, the hollistic assessing of **ICA** still has it behind **PCA**.
+Curiously, **ICA** yields results similar to **PCA**, with a weighted Cohen's Kappa of `r round(data_ica_cohen$weighted, 2)`. Even though this puts it at eye level with **PCA**, the processing power needed for this technique is noticeably larger, and thus, the hollistic assessing of **ICA** still has it behind **PCA**.  
 
-```{r data_ica_autoplot, echo=FALSE, results='asis'}
-#plot(data_ica)
+```{r data_ica_pairplot, echo=FALSE, results='asis'}
+pairs(data_ica_exfeat[,1:5], col=rainbow(3)[data_df_bal[,1]])
 ```
 
 ```{r data_garbage_collect_1, include=FALSE, echo=FALSE}
@@ -1204,7 +1221,7 @@ The basic idea underlying Factor Analysis is that *p* observed random variables,
 
 Factor Analysis has been applied in psychology to identify groups of inter-related variables, as those components of intelligence that can be placed under a single factor *g* or *general intelligence*, grouping factors such as *broad visual perception* (it includes all the intelligence variables related to visual tasks), or *broad auditory percention* (same as before, but with auditory tasks). This is interpreted as someone with a high *g* having good *broad auditory and visual perceptions*, and *g* sinthetically explaining the behaviour of the factors and variables "contained" within itself.  
 
-This technique is applied here to the given data set.
+This technique is applied here to the given data set, with a lower tolerance boundary of 0.07, found through trial to get to convergence.  
 
 ```{r data_factanal, include=FALSE, echo=FALSE}
 #EL VALOR MÁS BAJO ACEPTADO ES DE 0.07
@@ -1228,7 +1245,7 @@ data_factanal_perc_hit <- sum(diag(data_factanal_perc_table))
 data_factanal_cohen <- cohen.kappa(data_factanal_table)
 ```
 
-The data set, previously scaled and balanced via a *SMOTE* function, is fitted to a **Factor Analysis** workflow. The optimal amount of extracted features is retained, and the resulting, transformed data set, is subset into training and test sets. They're are then used to train an **SVM** C-clasiffication type protocol, and predict the test classes.
+The data set, previously scaled and balanced via a *SMOTE* function, is fitted to a **Factor Analysis** workflow. The optimal amount of extracted features is retained, and the resulting, transformed data set, is subset into training and test sets. They're are then used to train an **SVM** C-clasiffication type protocol, and predict the test classes.  
 
 After fitting and predicting, the  hit and hit percentage values are extracted and represented in **Table 9** and **Table 10**, in absolute and percentage values, respectively.  
 
@@ -1241,19 +1258,31 @@ kable(data_factanal_perc_table, caption = 'Factor Analysis observed (vertical) v
 
 This technique gives a weighted Cohen's Kappa Value of `r round(data_factanal_cohen$weighted, 2)`. This value is surprising, given that it puts the **Factor Analysis** technique's accuracy over the **PCA**, which is a peculiar result. This can be a specific case in which **Factor Analysis** is better in a metric sense, while it is clearly more costly in processing power.  
 
-As a visual, informative measure, it is interesting to have the **Factor Analysis** output fitted components plotted, coloured by *tipoCelula* label.  
+As a visual, informative measure, it is interesting to have the **Factor Analysis** output fitted components plotted, coloured by *tipoCelula* label. Once again, only the two main extracted factors will be plotted, as plotting the whole set of 210 factors would clutter the plot and make it unintelligible. The centroid for this two factors is pointed in red.  
 
 ```{r data_factanal_autoplot, echo=FALSE, results='asis'}
-#autoplot(data_factanal, data = data_df, colour = 'tipoCelula')
+cnt1 <- mean(data_factanal_exfeat[,1])
+cnt2 <- mean(data_factanal_exfeat[,2])
+autoplot(data_factanal, data = data_df_bal, colour = 'tipoCelula') + geom_point(x=cnt1, y=cnt2, colour="red", size=3)
 ```
 
 All this said, what **Factor Analysis** does (and what makes it unique) is create a matrix of loadings, this is, it creates columns with synthetic factors that "rely" on and group up subsets of the original variables. These new features are semantic groupings of the original variables, giving this technique an added value as it reveals hidden relations between variables.  
 
-Given these new relationships, it is up to the analyst to name them in a semantically comprising manner (let it be said, as an example, that two theoretical variables "speed" and "agility" were revealed to be bound; the wrapping extracted feature could be named, maybe, "mobility"). In this project these complex relationships won't be named, but given more time, the traits that bind these variables together could be analysed and these new features named.   
+Given these new relationships, it is up to the analyst to name them in a semantically comprising manner (let it be said, as an example, that two theoretical variables "speed" and "agility" were revealed to be bound; the wrapping extracted feature could be named, maybe, "mobility"). In this project these complex relationships won't be named, but given more time, the traits that bind these variables together could be analysed and these new features named. Still, for the sake of visualization, the loadings for (some of) the variables in the main two factors can be plotted as follows:  
+
+```{r data_factanal_loading_plot, echo=FALSE, results='asis'}
+#Plot loadings against one another
+data_factanal_loadings = data_factanal$loadings[,1:2]
+#Initialize the plot
+plot(data_factanal_loadings, type="n")
+#Add variable names
+text(data_factanal_loadings,labels=names(data_df_bal),cex=.2)
+```
+
 
 ###5.3.4 - LDA  
 
-**LDA** is a generalization of *Fisher's Linear Discriminant* widely used for dimension reduction and feature extraction. Here it will be used to find a linear combination of features able to classify the data set's entries into its correct class.
+**LDA** is a generalization of *Fisher's Linear Discriminant* widely used for dimension reduction and feature extraction. Here it will be used to find a linear combination of features able to classify the data set's entries into its correct class.  
 
 This technique is applied here.  
 
@@ -1279,7 +1308,7 @@ data_lda_perc_hit <- sum(diag(data_lda_perc_table))
 data_lda_cohen <- cohen.kappa(data_lda_table)
 ```
 
-The data set, previously scaled and balanced via a *SMOTE* function, is fitted to a **Linear Discriminant Analysis** function. **LDA**, by nature, won't be able to return the same number of components as the other techniques, so as an exception, this protocol will return **two** extracted features, and the resulting, transformed data set, will continue the protocol as standard and be subset into training and test sets. They're are then used to train an **SVM** C-clasiffication type protocol, and predict the test classes.
+The data set, previously scaled and balanced via a *SMOTE* function, is fitted to a **Linear Discriminant Analysis** function. **LDA**, by nature, won't be able to return the same number of components as the other techniques, so as an exception, this protocol will return **two** extracted features, and the resulting, transformed data set, will continue the protocol as standard and be subset into training and test sets. They're are then used to train an **SVM** C-clasiffication type protocol, and predict the test classes.  
 
 After fitting and predicting, the  hit and hit percentage values are extracted and represented in **Table 11** and **Table 12**, in absolute and percentage values, respectively.  
 
@@ -1292,13 +1321,17 @@ kable(data_lda_perc_table, caption = 'LDA observed (vertical) versus predicted (
 
 This technique gives a weighted Cohen's Kappa Value of `r round(data_lda_cohen$weighted, 2)`. It seems a high value is extracted from a data set with well defined class groupings and it may be that, for this application specifically, **LDA** is a good feature reduction technique.  
 
+```{r data_lda_autoplot, echo=FALSE, results='asis'}
+#autoplot(data_lda, data = data_df_bal, colour = 'tipoCelula')
+```
+
 ##5.4 - Dimension Reduction Techniques - Python  
 
 During coding, it was discovered that even in a streamlined coding and editing environment like **R Markdown** and **Knitr**, where chunks of different programming languages can be concatenated and run in the same script and then rendered into a TeX-PDF document, Python variables and objects don't persist between chunks.  
 
 For this reason, data had to be loaded and preprocessed for every technique. Where necessary, a randomizer seed (123) was used, as to make results replicable.  
 
-*Cohen's Kappa* and Confusion Matrices were extracted via **R** functions. This was done to streamline the process, via extraction of observed and predicted labels to secondary files and using them as input for the **R** functions.
+*Cohen's Kappa* and Confusion Matrices were extracted via **R** functions. This was done to streamline the process, via extraction of observed and predicted labels to secondary files and using them as input for the **R** functions.  
 
 The implementations of each of them are undertaken in this section.  
 
@@ -1306,7 +1339,7 @@ The implementations of each of them are undertaken in this section.
 
 **PCA** in **Python** is undertaken via **Scikit-learn**, a **Python** module built on **Numpy**, **Scipy** and **Matplotlib** for machine learning tasks. As in **R**, the basic function for **PCA** is of a basic simplicity.  
 
-The data set is scaled and centered, then over-sampled via **imblearn**'s implementation of the *SMOTE()* function, subset into training and test sets via a randomizing splitter function (*train_test_split()*, from **sklearn.model_selection**), and then reduced via **PCA**. It is subsequently used for **SVM** training and testing.
+The data set is scaled and centered, then over-sampled via **imblearn**'s implementation of the *SMOTE()* function, subset into training and test sets via a randomizing splitter function (*train_test_split()*, from **sklearn.model_selection**), and then reduced via **PCA**. It is subsequently used for **SVM** training and testing.  
 
 For this project, 210 of the features extracted by **PCA** are retained and used in the fitting, training and prediction of classes, in order to replicate **R** parameters where possible. The following section depicts the results of this protocol.  
 
@@ -1357,6 +1390,24 @@ data_pca_py_svm = svm.SVC(kernel='rbf')
 #Ajustar SVM
 data_pca_py_svm_fit = data_pca_py_svm.fit(data_pca_predictors_train, data_pca_responses_train.ravel()).predict(data_pca_predictors_test)
 
+#Plot
+plt.figure()
+
+colors = ['forestgreen','darkorange','royalblue']
+
+lw = 2
+
+target_names = ['ATYPICAL_LYMPHOCYTE','LYMPHOCYTE','VARIANT_LYMPHOCYTE']
+
+for color, i, target_name in zip(colors, [0, 1, 2], target_names):
+  plt.scatter(data_pca_py_transf[i, 0], data_pca_py_transf[i, 1], color=color, alpha=.8, lw=lw,label=target_name)
+
+plt.legend(loc='best', shadow=False, scatterpoints=1)
+
+plt.title('PCA - Python')
+
+plt.show()
+
 #Sacar valores esperados y observados a ficheros temporales
 numpy.savetxt('data_pca_responses_test_1D.csv', data_pca_responses_test, delimiter=",", fmt="%s")
      
@@ -1391,7 +1442,7 @@ After fitting and predicting, hit and hit percentage values are extracted and re
 
 **ICA** in **Python** is undertaken via **Scikit-learn** too. It doesn't need to be overly parameterized in order to run a basic **ICA** protocol.  
 
-The data set is scaled and centered, then over-sampled via **imblearn**'s implementation of the *SMOTE()* function, subset into training and test sets via a randomizing splitter function (*train_test_split()*, from **sklearn.model_selection**), and then reduced via **ICA**. It is subsequently used for **SVM** training and testing.
+The data set is scaled and centered, then over-sampled via **imblearn**'s implementation of the *SMOTE()* function, subset into training and test sets via a randomizing splitter function (*train_test_split()*, from **sklearn.model_selection**), and then reduced via **ICA**. It is subsequently used for **SVM** training and testing.  
 
 For this project, 210 of the features extracted by **ICA** are retained and used in the fitting, training and prediction of classes, in order to replicate **R** parameters where possible. Also with this goal in  mind, tolerance and maximum iterations before convergence were adjusted to mimic the **R** defaults (tolerance: 0.000001 and maximum iterations: 100). The following section depicts the results of this protocol.  
 
@@ -1467,7 +1518,7 @@ kable(data_ica_py_table, caption = 'ICA observed (vertical) versus predicted (ho
 kable(data_ica_py_perc_table, caption = 'ICA observed (vertical) versus predicted (horizontal) results - percentages', digits = 2, format = "latex")
 ```
 
-Hit and hit percentage values, although invalid for comparison, are nevertheless extracted and represented in **Table 15** and **Table 16**.
+Hit and hit percentage values, although invalid for comparison, are nevertheless extracted and represented in **Table 15** and **Table 16**.  
 
 It is discovered that the predicted values all yield an **ATYPICAL_LYMPHOCYTE** result. This is due to the fact that if tuned with the samedefault parameters as its **R** analogue, **Python's FastICA** doesn't even get to convergence, apart from taking a lot of processing time; still, it provides an interesting result: this technique's *Cohen's Kappa* is **zero**, which is remarkable. In the observed test labels the **ATYPICAL_LYMPHOCYTE** result is registered a majority of times, which, if only raw accuracy was used as metric, would yield a high random hit rate. Instead, *Cohen's Kappa* takes into account the probability of this one being the result, which in the predicted values is of a 100%, and lowers the expected validity of such a prediction from the high random accuracy potential yield to a round zero. Even though the raw **ICA**-constructed prediction is of an underwhelming precision, the solidity of *Cohen's Kappa* as a metric is supported by this occurrence.  
 
@@ -1475,11 +1526,11 @@ It is discovered that the predicted values all yield an **ATYPICAL_LYMPHOCYTE** 
 
 **Factor Analysis** in **Python** is undertaken via **Scikit-learn**'s function *FactorAnalysis()*, using as parameter the number of features to be extracted.   
 
-The data set is scaled and centered, then over-sampled via **imblearn**'s implementation of the *SMOTE()* function, reduced via **Factor Analysis**, and then subset into training and test sets via a randomizing splitter function (*train_test_split()*, from **sklearn.model_selection**). It is subsequently used for **SVM** training and testing.
+The data set is scaled and centered, then over-sampled via **imblearn**'s implementation of the *SMOTE()* function, reduced via **Factor Analysis**, and then subset into training and test sets via a randomizing splitter function (*train_test_split()*, from **sklearn.model_selection**). It is subsequently used for **SVM** training and testing.  
 
 For this project, 210 of the features extracted by **Factor Analysis** are retained and used in the fitting, training and prediction of classes, in order to replicate **R** parameters where possible. The following section depicts the results of this protocol.  
 
-This technique is applied here to the given data set.
+This technique is applied here to the given data set.  
 
 ```{python data_3, echo=FALSE, warning = FALSE, message = FALSE, results = 'asis'}
 import scipy
@@ -1560,7 +1611,7 @@ This technique gives a weighted Cohen's Kappa Value of `r round(data_factanal_py
 
 **LDA** in **Python** is undertaken via **Scikit-learn**'s function *FactorAnalysis()*, from the submodule *discriminant_analysis*, using as parameter the number of features to be extracted.   
 
-The data set is scaled and centered, then over-sampled via **imblearn**'s implementation of the *SMOTE()* function, reduced via **Linear Discriminant Analysis**, and then subset into training and test sets via a randomizing splitter function (*train_test_split()*, from **sklearn.model_selection**). It is subsequently used for **SVM** training and testing.
+The data set is scaled and centered, then over-sampled via **imblearn**'s implementation of the *SMOTE()* function, reduced via **Linear Discriminant Analysis**, and then subset into training and test sets via a randomizing splitter function (*train_test_split()*, from **sklearn.model_selection**). It is subsequently used for **SVM** training and testing.  
 
 For this project, 210 of the features extracted by **LDA** are retained and used in the fitting, training and prediction of classes, in order to replicate **R** parameters where possible. The following section depicts the results of this protocol.  
 
@@ -1667,8 +1718,8 @@ rownames(result_table) <- result_table_rownames
 kable(result_table, caption = 'Cohen\'s Kappa Values and additional comments by technique', digits = 2, format = "latex")
 ```
 
-- That **Python**, in respect to statistics-oriented modules, is a more-streamlined, less flexible language than **R**.
-- That **R** offers more implementations of even obscure or little known protocols and algorithms, and offers better flexibility to tamper with them, if the user is adept at coding.
+- That **Python**, in respect to statistics-oriented modules, is a more-streamlined, less flexible language than **R**.  
+- That **R** offers more implementations of even obscure or little known protocols and algorithms, and offers better flexibility to tamper with them, if the user is adept at coding.  
 - That **PCA** acts as an effective benchmark, being the "golden standard" of widely appliable dimension reduction techniques.  
 - That in **R**, **ICA** produces similar results, while not fine-tuned, to PCA; in **Python**, it requires a tolerance threshold too high to achieve convergence and under-performs compared to **PCA**.  
 - That **Factor Analysis** and **Linear Discriminant Analysis**, for this area of application, generally yield better results than **PCA** or **ICA**.  
@@ -1681,10 +1732,12 @@ kable(result_table, caption = 'Cohen\'s Kappa Values and additional comments by 
 
 Also, as a last conclussion, this study merits a longer research. As such, milestones along a theoretical future roadmap could include:  
 
-- Implementing a processing objective metric, such as *System.time()* or *tictoc* in **R** or *time()* in Python, and a trial protocol, such that differences in processing time can be objectively measured and cross-tested.
+- Implementing a processing objective metric, such as *System.time()* or *tictoc* in **R** or *time()* in Python, and a trial protocol, such that differences in processing time can be objectively measured and cross-tested.  
 - A better implementation of Python code, more object-oriented, as to optimise processing.  
 - Cross-testing of different parameter setups, in order to better understand not only the best performers, but the best configurations.  
 - A visualization module or script for both **Python** and **R**. Right now, while **R** offers direct applications of plotting systems for the practical majority of its functions, **Python** requires a lot of tweaking of its modules (mainly *matplotlib*), especially for data sets with so many features, even when reduced to such a number as 210.  
+
+\pagebreak  
 
 #7 - Glossary  
 
@@ -1695,5 +1748,7 @@ Also, as a last conclussion, this study merits a longer research. As such, miles
 **Lymphoblast**: Activated form of a lymphocyte with an increased volume and protein-synthesis activity.  
 **Lymphocyte**: White blood cell subtype, part of the immune system, which includes **adaptive** and **innate** immunity cells.  
 **Object-oriented**: Programming paradigm focused on the creation of objects, entities or classes, with a complete semantic body, full with attributes and methods.  
+
+\newpage
 
 #8 - References  

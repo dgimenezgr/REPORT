@@ -1,11 +1,17 @@
 ---
-title: "Dimension Reduction - Comparison Code for Python"
+output:
+  pdf_document:
+    keep_tex: true
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, engine.path = list(python = '/usr/bin/python'), tidy=TRUE, cache = TRUE, fig.width=12, fig.height=4, comment = NULL, out.height='200px', dpi=200, fig.pos = 'h', out.extra = '')
+knitr::opts_chunk$set(echo = TRUE, fig.lp = "Fig. ", tidy.opts=list(width.cutoff=50),tidy=TRUE)
 ```
+
+##Annex 2 - Python comparison code  
+
 ```{python data_1, include=TRUE, eval=FALSE}
+#Import all necessary modules
 import scipy
 import numpy
 import pandas as pd
@@ -14,33 +20,36 @@ from sklearn import svm
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import cohen_kappa_score
 from sklearn.metrics import confusion_matrix
+
+#Define data metavariables and load data
 data_pydf_predictor_ids = range(7,2874)
 data_pydf_predictors = pd.read_csv('data/data.csv', usecols=data_pydf_predictor_ids)
 data_pydf_predictors = data_pydf_predictors.values
 data_pydf_responses = pd.read_csv('data/data.csv', usecols=['tipoCelula'])
 data_pydf_responses = data_pydf_responses.values
-#Configurar modelo PCA
+
+#Configure PCA object
 data_pca_py = PCA(n_components=210,copy=True)
 
-#Ajustar PCA con predictores
+#Fit PCA with predictors
 data_pca_py_fit = data_pca_py.fit(data_pydf_predictors, data_pydf_responses.ravel())
 
-#Transformar el df de predictores con los 210 componentes principales
+#Transform predictors on selected PCs
 data_pca_py_transf = data_pca_py_fit.transform(data_pydf_predictors)
 
-#Hacer subset de predictores transformados de training y de test
+#Subset transformed data into test and training subsets
 data_pca_predictors_train, data_pca_predictors_test, data_pca_responses_train, data_pca_responses_test = train_test_split(data_pca_py_transf, data_pydf_responses, train_size = 0.66, test_size = 0.34, random_state=123)
 
-#Convertir el array de respuestas de test a una dimensión para comparación.
+#Convert response array to 1D for prediction
 data_pca_responses_test_1D = data_pca_responses_test[:,0]
 
-#Aplicar SVM
+#Initialize SVM
 data_pca_py_svm = svm.SVC(kernel='rbf')
 
-#Ajustar SVM
+#Fit SVM
 data_pca_py_svm_fit = data_pca_py_svm.fit(data_pca_predictors_train, data_pca_responses_train.ravel()).predict(data_pca_predictors_test)
 
-#Sacar valores esperados y observados a ficheros temporales
+#Put classification results in temp file
 numpy.savetxt("data_pca_responses_test_1D.csv", data_pca_responses_test_1D, delimiter=",", fmt="%s")
      
 numpy.savetxt("data_pca_py_svm_fit.csv", data_pca_py_svm_fit, delimiter=",", fmt="%s")
@@ -49,13 +58,14 @@ numpy.savetxt("data_pca_py_svm_fit.csv", data_pca_py_svm_fit, delimiter=",", fmt
 ```{r results_1, include=TRUE, eval=FALSE}
 require(knitr)
 require(psych)
+#Load classification data as R objects
 data_pca_responses_test_1D <- read.csv(file = 'data_pca_responses_test_1D.csv', sep = ',', header = FALSE)
 data_pca_responses_test_1D <- data_pca_responses_test_1D[,1]
 
 data_pca_py_svm_fit <- read.csv(file = 'data_pca_py_svm_fit.csv', sep = ',', header = FALSE)
 data_pca_py_svm_fit <- data_pca_py_svm_fit[,1]
 
-#Tabular y sacar la Kappa de Cohen
+#Tabulate and solve Cohen's Kappa
 data_pca_py_table <- table(data_pca_py_svm_fit, data_pca_responses_test_1D)
 data_pca_py_perc_table <- prop.table(data_pca_py_table)*100
 data_pca_py_perc_hit <- sum(diag(data_pca_py_perc_table))
@@ -68,6 +78,7 @@ kable(data_pca_py_table, caption = 'PCA observed versus predicted results', digi
 kable(data_pca_py_perc_table, caption = 'PCA observed versus predicted results - percentages', digits = 2, format = "latex")
 ```
 ```{python data_2, include=TRUE, eval=FALSE}
+#Import all necessary modules
 import scipy
 import numpy
 import pandas as pd
@@ -77,47 +88,49 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import cohen_kappa_score
 from sklearn.metrics import confusion_matrix
 
+#Define data metavariables and load data
 data_pydf_predictor_ids = range(7,2874)
 data_pydf_predictors = pd.read_csv('data/data.csv', usecols=data_pydf_predictor_ids)
 data_pydf_predictors = data_pydf_predictors.values
 data_pydf_responses = pd.read_csv('data/data.csv', usecols=['tipoCelula'])
 data_pydf_responses = data_pydf_responses.values
 
-#Configurar modelo ICA
+#Configure ICA object
 data_ica_py = FastICA(n_components=210)
 
-#Ajustar ICA con predictores
+#Fit ICA with predictors
 data_ica_py_fit = data_ica_py.fit(data_pydf_predictors, data_pydf_responses.ravel())
 
-#Transformar el df de predictores con los 20 componentes principales
+#Transform predictors on selected factors
 data_ica_py_transf = data_ica_py_fit.transform(data_pydf_predictors)
 
-#Hacer subset de predictores transformados de training y de test
+#Subset transformed data into test and training subsets
 data_ica_predictors_train, data_ica_predictors_test, data_ica_responses_train, data_ica_responses_test = train_test_split(data_ica_py_transf, data_pydf_responses, train_size = 0.66, test_size = 0.34, random_state=123)
 
-#Convertir el array de respuestas de test a una dimensión para comparación.
+#Convert response array to 1D for prediction
 data_ica_responses_test_1D = data_ica_responses_test[:,0]
 
-#Aplicar SVM
+#Initialize SVM
 data_ica_py_svm = svm.SVC(kernel='rbf')
 
-#Ajustar SVM
+#Fit SVM
 data_ica_py_svm_fit = data_ica_py_svm.fit(data_ica_predictors_train, data_ica_responses_train.ravel()).predict(data_ica_predictors_test)
 
-#Sacar valores esperados y observados a ficheros temporales
+#Put classification results in temp file
 numpy.savetxt("data_ica_responses_test_1D.csv", data_ica_responses_test_1D, delimiter=",", fmt="%s")
      
 numpy.savetxt("data_ica_py_svm_fit.csv", data_ica_py_svm_fit, delimiter=",", fmt="%s")
 
 ```
 ```{r results_2, include=TRUE, eval=FALSE}
+#Load classification data as R objects
 data_ica_responses_test_1D <- read.csv(file = 'data_ica_responses_test_1D.csv', sep = ',', header = FALSE)
 data_ica_responses_test_1D <- data_ica_responses_test_1D[,1]
 
 data_ica_py_svm_fit <- read.csv(file = 'data_ica_py_svm_fit.csv', sep = ',', header = FALSE)
 data_ica_py_svm_fit <- data_ica_py_svm_fit[,1]
 
-#Tabular y sacar la Kappa de Cohen
+#Tabulate and solve Cohen's Kappa
 data_ica_py_table <- table(data_ica_py_svm_fit, data_ica_responses_test_1D)
 data_ica_py_perc_table <- prop.table(data_ica_py_table)*100
 data_ica_py_perc_hit <- sum(diag(data_ica_py_perc_table))
@@ -130,6 +143,7 @@ kable(data_ica_py_table, caption = 'ICA observed versus predicted results', digi
 kable(data_ica_py_perc_table, caption = 'ICA observed versus predicted results - percentages', digits = 2, format = "latex")
 ```
 ```{python data_3, include=TRUE, eval=FALSE}
+#Import all necessary modules
 import scipy
 import numpy
 import pandas as pd
@@ -139,47 +153,49 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import cohen_kappa_score
 from sklearn.metrics import confusion_matrix
 
+#Define data metavariables and load data
 data_pydf_predictor_ids = range(7,2874)
 data_pydf_predictors = pd.read_csv('data/data.csv', usecols=data_pydf_predictor_ids)
 data_pydf_predictors = data_pydf_predictors.values
 data_pydf_responses = pd.read_csv('data/data.csv', usecols=['tipoCelula'])
 data_pydf_responses = data_pydf_responses.values
 
-#Configurar Factor Analysis
+#Configure Factor Analysis object
 data_factanal_py = FactorAnalysis(n_components=210)
 
-#Ajustar Factor Analysis con predictores y respuestas
+#Fit FA with predictors
 data_factanal_py_fit = data_factanal_py.fit(data_pydf_predictors, data_pydf_responses.ravel())
 
-#Transformar el df de predictores con los 210 componentes principales
+#Transform predictors on selected factors
 data_factanal_py_transf = data_factanal_py_fit.transform(data_pydf_predictors)
 
-#Hacer subset de predictores transformados de training y de test
+#Subset transformed data into test and training subsets
 data_factanal_predictors_train, data_factanal_predictors_test, data_factanal_responses_train, data_factanal_responses_test = train_test_split(data_factanal_py_transf, data_pydf_responses, train_size = 0.66, test_size = 0.34, random_state=123)
 
-#Convertir el array de respuestas de test a una dimensión para comparación.
+#Convert response array to 1D for prediction
 data_factanal_responses_test_1D = data_factanal_responses_test[:,0]
 
-#Aplicar SVM
+#Initialize SVM
 data_factanal_py_svm = svm.SVC(kernel='rbf')
 
-#Ajustar SVM
+#Fit SVM
 data_factanal_py_svm_fit = data_factanal_py_svm.fit(data_factanal_predictors_train, data_factanal_responses_train.ravel()).predict(data_factanal_predictors_test)
 
-#Sacar valores esperados y observados a ficheros temporales
+#Put classification results in temp file
 numpy.savetxt("data_factanal_responses_test_1D.csv", data_factanal_responses_test_1D, delimiter=",", fmt="%s")
      
 numpy.savetxt("data_factanal_py_svm_fit.csv", data_factanal_py_svm_fit, delimiter=",", fmt="%s")
 
 ```
 ```{r results_3, include=TRUE, eval=FALSE}
+#Load classification data as R objects
 data_factanal_responses_test_1D <- read.csv(file = 'data_factanal_responses_test_1D.csv', sep = ',', header = FALSE)
 data_factanal_responses_test_1D <- data_factanal_responses_test_1D[,1]
 
 data_factanal_py_svm_fit <- read.csv(file = 'data_factanal_py_svm_fit.csv', sep = ',', header = FALSE)
 data_factanal_py_svm_fit <- data_factanal_py_svm_fit[,1]
 
-#Tabular y sacar la Kappa de Cohen
+#Tabulate and solve Cohen's Kappa
 data_factanal_py_table <- table(data_factanal_py_svm_fit, data_factanal_responses_test_1D)
 data_factanal_py_perc_table <- prop.table(data_factanal_py_table)*100
 data_factanal_py_perc_hit <- sum(diag(data_factanal_py_perc_table))
@@ -192,6 +208,7 @@ kable(data_factanal_py_table, caption = 'Factor Analysis observed versus predict
 kable(data_factanal_py_perc_table, caption = 'Factor Analysis observed versus predicted results - percentages', digits = 2, format = "latex")
 ```
 ```{python data_4, include=TRUE, eval=FALSE}
+#Import all necessary modules
 import scipy
 import numpy
 import pandas as pd
@@ -201,47 +218,49 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import cohen_kappa_score
 from sklearn.metrics import confusion_matrix
 
+#Define data metavariables and load data
 data_pydf_predictor_ids = range(7,2874)
 data_pydf_predictors = pd.read_csv('data/data.csv', usecols=data_pydf_predictor_ids)
 data_pydf_predictors = data_pydf_predictors.values
 data_pydf_responses = pd.read_csv('data/data.csv', usecols=['tipoCelula'])
 data_pydf_responses = data_pydf_responses.values
 
-#Configurar modelo ICA
+#Configure LDA object
 data_lda_py = LinearDiscriminantAnalysis(n_components=210)
 
-#Ajustar ICA con predictores y respuestas
+#Fit LDA with predictors
 data_lda_py_fit = data_lda_py.fit(data_pydf_predictors, data_pydf_responses.ravel())
 
-#Transformar el df de predictores con los 210 componentes principales
+#Transform predictors on selected factors
 data_lda_py_transf = data_lda_py_fit.transform(data_pydf_predictors)
 
-#Hacer subset de predictores transformados de training y de test
+#Subset transformed data into test and training subsets
 data_lda_predictors_train, data_lda_predictors_test, data_lda_responses_train, data_lda_responses_test = train_test_split(data_lda_py_transf, data_pydf_responses, train_size = 0.66, test_size = 0.34, random_state=123)
 
-#Convertir el array de respuestas de test a una dimensión para comparación.
+#Convert response array to 1D for prediction
 data_lda_responses_test_1D = data_lda_responses_test[:,0]
 
-#Aplicar SVM
+#Initialize SVM
 data_lda_py_svm = svm.SVC(kernel='rbf')
 
-#Ajustar SVM
+#Fit SVM
 data_lda_py_svm_fit = data_lda_py_svm.fit(data_lda_predictors_train, data_lda_responses_train.ravel()).predict(data_lda_predictors_test)
 
-#Sacar valores esperados y observados a ficheros temporales
+#Put classification results in temp file
 numpy.savetxt("data_lda_responses_test_1D.csv", data_lda_responses_test_1D, delimiter=",", fmt="%s")
      
 numpy.savetxt("data_lda_py_svm_fit.csv", data_lda_py_svm_fit, delimiter=",", fmt="%s")
 
 ```
 ```{r results_4, include=TRUE, eval=FALSE}
+#Load classification data as R objects
 data_lda_responses_test_1D <- read.csv(file = 'data_lda_responses_test_1D.csv', sep = ',', header = FALSE)
 data_lda_responses_test_1D <- data_lda_responses_test_1D[,1]
 
 data_lda_py_svm_fit <- read.csv(file = 'data_lda_py_svm_fit.csv', sep = ',', header = FALSE)
 data_lda_py_svm_fit <- data_lda_py_svm_fit[,1]
 
-#Tabular y sacar la Kappa de Cohen
+#Tabulate and solve Cohen's Kappa
 data_lda_py_table <- table(data_lda_py_svm_fit, data_lda_responses_test_1D)
 data_lda_py_perc_table <- prop.table(data_lda_py_table)*100
 data_lda_py_perc_hit <- sum(diag(data_lda_py_perc_table))

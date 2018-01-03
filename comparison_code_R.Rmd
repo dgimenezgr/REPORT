@@ -1,11 +1,16 @@
 ---
-title: "Dimension Reduction - Comparison Code for R"
+output:
+  pdf_document
+    keep_tex: true
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, fig.lp = "Fig. ", tidy.opts=list(width.cutoff=60),tidy=TRUE, cache = TRUE, fig.width=12, fig.height=4, comment = NULL, out.height='200px', dpi=200, fig.pos = 'h', out.extra = '', engine.path = list(python = 'C:/Program Files (x86)/eMule/python/python.exe'))
+knitr::opts_chunk$set(echo = TRUE, fig.lp = "Fig. ", tidy.opts=list(width.cutoff=50),tidy=TRUE)
 ```
-```{r library_load, include=TRUE, eval=FALSE}
+
+##Annex 1 - R comparison code  
+
+```{r library_load_annex, include=TRUE, eval=FALSE}
 require(knitr)
 require(stats)
 require(caret)
@@ -15,48 +20,55 @@ require(psych)
 require(MASS)
 require(ggplot2)
 require(ggfortify)
-#require(DMwR)
+require(DMwR)
 ```
-```{r data_var_declare, include=TRUE, eval=FALSE}
+```{r data_var_declare_annex, include=TRUE, eval=FALSE}
+#Data metavariables
 data_class_factors <- 7
 data_class_numeric <- 2867
 data_response_index <- 2
 
 ```
-```{r data_load, include=TRUE, eval=FALSE}
-#Tipos de variable por columna
+```{r data_load_annex, include=TRUE, eval=FALSE}
+#Classes of variable by column
 colClasses <- append(c(rep("factor",data_class_factors)),c(rep("numeric",data_class_numeric)))
-#Carga de los datos del CSV
-data_df <- read.csv2(file = "data/data.csv", sep = ",", dec = ".", colClasses = colClasses, stringsAsFactors = FALSE)
-#Fórmula del modelo
-data_formula <- as.formula(paste(colnames(data_df[data_response_index]), "~", paste(colnames(data_df)[-(1:data_class_factors)], collapse=" + ")))
-#Balancear datos con SMOTE. ROSE sólo funciona para clasificaciones binarias.
-#data_df <- SMOTE(data_formula, perc-over = 200, perc.under = 200, k = 5)
 
-#Semilla para aleatorización controlada
+#Load CSV data
+data_df <- read.csv2(file = "data/data.csv", sep = ",", dec = ".", colClasses = colClasses, stringsAsFactors = FALSE)
+
+#Model formula
+data_formula <- as.formula(paste(colnames(data_df[data_response_index]), "~", paste(colnames(data_df)[-(1:data_class_factors)], collapse=" + ")))
+
+#Balance out data with SMOTE, as ROSE only works on binary classifications.
+data_df <- SMOTE(data_formula, perc.over = 200, k = 5)
+
+#Seed for controlled randomization
 set.seed(123)
 
-#Subsets de predictores y respuestas
+#Response and predictor subsets
 data_df_predictors <- data_df[,8:2874]
 data_df_predictors <- scale(data_df_predictors)
 data_df_responses <- data_df[,data_response_index]
 
-#Índices para training
+#Training indices
 data_train_index <- sample(1:nrow(data_df), ceiling(nrow(data_df)*.66))
 write.table(as.vector(data_train_index), file = "data/data_train_index.csv",row.names=FALSE,col.names=FALSE, sep=",")
 
-#Subset de respuestas de training
+#Training responses subset
 data_df_train_responses <- data_df_responses[data_train_index]
-#Subset de respuestas de test
+
+#Test responses subset
 data_df_test_responses <- data_df_responses[-data_train_index]
 
 ```
-```{r data_pca_features_number, include=TRUE, eval=FALSE}
-#Calcular componentes principales
+```{r data_pca_features_number_annex, include=TRUE, eval=FALSE}
+#Fit PCA
 data_pca <- prcomp(data_df_predictors)
-#Sacar el sumario de la PCA.
+
+#Summarize PCA
 data_pca_summary <- summary(data_pca)
-#Calcular las features que explican al menos el 95% de la varianza
+
+#Get the number of variables explaining at the very least 85% of variance
 for (i in seq(from = 10, to = 250, by = 10)) {
   data_varExp <- sum(data_pca_summary$importance[2,1:i])
   if (data_varExp >= 0.95) {
@@ -66,78 +78,86 @@ for (i in seq(from = 10, to = 250, by = 10)) {
   }
 }
 ```
-
-```{r data_exfeat_message, include=TRUE, eval=FALSE}
+```{r data_exfeat_message_annex, include=TRUE, eval=FALSE}
 cat(varImpMessage)
 ```
-```{r data_pca, include=TRUE, eval=FALSE}
-#De los componentes principales, escoger los primeros 210
+```{r data_pca_annex, include=TRUE, eval=FALSE}
+#Choose the selected number of PCs
 data_pca_exfeat <- data_pca$x[,1:data_optimal_exfeat]
-#Generar los sets de training y test
+
+#Generate training and test sets
 data_pca_train <- subset(data_pca_exfeat[data_train_index,])
 data_pca_test <- subset(data_pca_exfeat[-data_train_index,])
-#Ajustar una SVM con las 20 componentes principales extraídas
+
+#Fit SVM with training sets
 data_pca_svm <- svm(data_pca_train, y = data_df_train_responses, type = "C-classification", kernel = "radial")
-#Usar esa SVM para predecir las respuestas
+
+#Feed SVM with test data for prediction
 data_pca_predict <- stats::predict(data_pca_svm, data_pca_test)
-#Tabular y sacar la Kappa de Cohen
+
+#Tabulate and solve Cohen's Kappa
 data_pca_table <- table(data_pca_predict, data_df_test_responses)
 data_pca_perc_table <- prop.table(data_pca_table)*100
 data_pca_perc_hit <- sum(diag(data_pca_perc_table))
 data_pca_cohen <- cohen.kappa(data_pca_table, n.obs = length(data_df_test_responses))
 ```
-```{r data_pca_table, include=TRUE, eval=FALSE}
+```{r data_pca_table_annex, include=TRUE, eval=FALSE}
 kable(data_pca_table, caption = 'PCA observed versus predicted results', digits = 2, format = "latex")
 ```
-```{r data_pca_perc_table, include=TRUE, eval=FALSE}
+```{r data_pca_perc_table_annex, include=TRUE, eval=FALSE}
 kable(data_pca_perc_table, caption = 'PCA observed versus predicted results - percentages', digits = 2, format = "latex")
 ```
-```{r data_ica, include=TRUE, eval=FALSE}
-#Extraer 210 features
+```{r data_ica_annex, include=TRUE, eval=FALSE}
+#Choose the selected number of features while fitting ICA
 data_ica <- icafast(data_df_predictors, nc = data_optimal_exfeat)
 data_ica_exfeat <- data_ica$S
-#Generar los sets de training y test
+
+#Generate training and test sets
 data_ica_train <- subset(data_ica_exfeat[data_train_index,])
 data_ica_test <- subset(data_ica_exfeat[-data_train_index,])
 
-#Someter esas 210 features (la matriz de señales S) a SVM
+#Fit SVM with training sets
 data_ica_svm <- svm(data_ica_train, y = data_df_train_responses, type = "C-classification", kernel = "radial")
-#Predecir con el modelo ajustado las respuestas
+
+#Feed SVM with test data for prediction
 data_ica_predict <- stats::predict(data_ica_svm, data_ica_test)
-#Tabular datos y sacar Kappa de Cohen
+
+#Tabulate and solve Cohen's Kappa
 data_ica_table <- table(data_ica_predict, data_df_test_responses)
 data_ica_perc_table <- prop.table(data_ica_table)*100
 data_ica_perc_hit <- sum(diag(data_ica_perc_table))
 data_ica_cohen <- cohen.kappa(data_ica_table, n.obs = length(data_df_test_responses))
 ```
-```{r data_ica_table, include=TRUE, eval=FALSE}
+```{r data_ica_table_annex, include=TRUE, eval=FALSE}
 kable(data_ica_table, caption = 'ICA observed versus predicted results', digits = 2, format = "latex")
 ```
-```{r data_ica_perc_table, include=TRUE, eval=FALSE}
+```{r data_ica_perc_table_annex, include=TRUE, eval=FALSE}
 kable(data_ica_perc_table, caption = 'ICA observed versus predicted results - percentages', digits = 2, format = "latex")
 ```
-```{r data_ica_autoplot, include=TRUE, eval=FALSE}
+```{r data_ica_autoplot_annex, include=TRUE, eval=FALSE}
 #plot(data_ica)
 ```
-```{r data_garbage_collect_1, include=FALSE, echo=FALSE}
+```{r data_garbage_collect_1_annex, include=FALSE, echo=FALSE}
 gc()
 ```
-```{r data_factanal, include=TRUE, eval=FALSE}
-#EL VALOR MÁS BAJO ACEPTADO ES DE 0.07
-#Extraer los loadings de 210 features. No nombraremos las nuevas features por la complejidad de ello.
+```{r data_factanal_annex, include=TRUE, eval=FALSE}
+#Choose the selected number of features with a lower tolerance boundary extracted on trial and error to be the best in convergence
 data_factanal <- factanal(data_df_predictors, factors = data_optimal_exfeat, scores = "Bartlett", lower = 0.07)
-#Utilizar esos loadings para transponer la nueva matriz de factores
+
+#Use loadings to transform preditor values
 data_factanal_exfeat <- data_df_predictors %*% data_factanal$loadings
 
-#Generar los sets de training y test
+#Generate training and test sets
 data_factanal_train <- subset(data_factanal_exfeat[data_train_index,])
 data_factanal_test <- subset(data_factanal_exfeat[-data_train_index,])
 
-#Ajustar un SVM con esos factores
+#Fit SVM with those factors
 data_factanal_svm <- svm(data_factanal_train, y = data_df_train_responses, type = "C-classification", kernel = "radial")
-#Predecir con el modelo ajustado las respuestas
+
+#Use fitted SVM to predict test responses
 data_factanal_predict <- stats::predict(data_factanal_svm, data_factanal_test)
-#Tabular datos y sacar Kappa de Cohen
+
+#Tabulate and solve Coehn's Kappa
 data_factanal_table <- table(data_factanal_predict, data_df_test_responses)
 data_factanal_perc_table <- prop.table(data_factanal_table)*100
 data_factanal_perc_hit <- sum(diag(data_factanal_perc_table))
@@ -146,36 +166,38 @@ data_factanal_cohen <- cohen.kappa(data_factanal_table)
 
 After fitting and predicting, the  hit and accuracy values are extracted and represented in **Table 5** and **Table 6**, in absolute and percentage values, respectively.  
 
-```{r data_factanal_table, include=TRUE, eval=FALSE}
+```{r data_factanal_table_annex, include=TRUE, eval=FALSE}
 kable(data_factanal_table, caption = 'Factor Analysis observed versus predicted results', digits = 2, format = "latex")
 ```
-```{r data_factanal_perc_table, include=TRUE, eval=FALSE}
+```{r data_factanal_perc_table_annex, include=TRUE, eval=FALSE}
 kable(data_factanal_perc_table, caption = 'Factor Analysis observed versus predicted results - percentages', digits = 2, format = "latex")
 ```
-```{r data_lda, include=TRUE, eval=FALSE}
-#Pasar por un LDA los predictores
+```{r data_lda_annex, include=TRUE, eval=FALSE}
+#Fit LDA with predictors
 data_lda <- lda(data_df_predictors, grouping = data_df_responses)
 
-#Transformar con los discriminantes lineales el set de predictores.
+#Transform predictors with linear discriminants
 data_lda_predictors_trans <- data_df_predictors %*% data_lda$scaling
 
-#Generar los sets de training y test
+#Generate training and test sets
 data_lda_train <- subset(data_lda_predictors_trans[data_train_index,])
 data_lda_test <- subset(data_lda_predictors_trans[-data_train_index,])
 
-#Ajustar un SVM con esos factores
+#Use training values to fit SVM
 data_lda_svm <- svm(data_lda_train, y = data_df_train_responses, type = "C-classification", kernel = "radial")
-#Predecir con el modelo ajustado las respuestas
+
+#Feed test data to SVM and predict
 data_lda_predict <- stats::predict(data_lda_svm, data_lda_test)
-#Tabular datos y sacar Kappa de Cohen
+
+#Tabulate and solve Cohen's Kappa
 data_lda_table <- table(data_lda_predict, data_df_test_responses)
 data_lda_perc_table <- prop.table(data_lda_table)*100
 data_lda_perc_hit <- sum(diag(data_lda_perc_table))
 data_lda_cohen <- cohen.kappa(data_lda_table)
 ```
-```{r data_lda_table, include=TRUE, eval=FALSE}
+```{r data_lda_table_annex, include=TRUE, eval=FALSE}
 kable(data_lda_table, caption = 'LDA observed versus predicted results', digits = 2, format = "latex")
 ```
-```{r data_lda_perc_table, include=TRUE, eval=FALSE}
+```{r data_lda_perc_table_annex, include=TRUE, eval=FALSE}
 kable(data_lda_perc_table, caption = 'LDA observed versus predicted results - percentages', digits = 2, format = "latex")
 ```
